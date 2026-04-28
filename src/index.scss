@@ -1,0 +1,55 @@
+:root {
+  --color-bg:      #000000;
+  --color-bg-2:    #060606;
+  --color-text:    #eeeae4;
+  --color-muted:   rgba(238, 234, 228, 0.42);
+  --color-border:  rgba(238, 234, 228, 0.1);
+  --color-border-2: rgba(238, 234, 228, 0.22);
+  --color-mega:    rgba(255, 255, 255, 0.055);
+
+  --color-accent:      #ff5722;
+  --color-accent-rgb:  255, 87, 34;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-body:    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100svh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
