@@ -215,8 +215,6 @@ export default function Contact() {
               </address>
             </div>
 
-            <div className="contact__separator" aria-hidden="true" />
-
             <div className="contact__socials">
               {[
                 {
@@ -385,10 +383,7 @@ export default function Contact() {
           </motion.div>
         </div>
 
-        <section
-          className="contact__faqs"
-          aria-labelledby="contact-faqs-title"
-        >
+        <section className="contact__faqs" aria-labelledby="contact-faqs-title">
           <motion.header
             className="contact__faqs-head"
             initial={{ opacity: 0, y: 30 }}

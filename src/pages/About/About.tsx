@@ -1,24 +1,22 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentType,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ShaderGradientCanvas as RawShaderGradientCanvas,
-  ShaderGradient as RawShaderGradient,
-} from "shadergradient";
+import { useLocation, useNavigationType } from "react-router-dom";
 import "./About.scss";
 
-const ShaderGradientCanvas = RawShaderGradientCanvas as ComponentType<
-  Record<string, unknown>
->;
-const ShaderGradient = RawShaderGradient as ComponentType<
-  Record<string, unknown>
->;
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
+
+const motionMap = {
+  div: motion.div,
+  span: motion.span,
+  p: motion.p,
+  h1: motion.h1,
+  h2: motion.h2,
+  h3: motion.h3,
+  li: motion.li,
+  section: motion.section,
+} as const;
+
+type RevealTag = keyof typeof motionMap;
 
 type RevealProps = {
   children: ReactNode;
@@ -26,7 +24,7 @@ type RevealProps = {
   y?: number;
   duration?: number;
   className?: string;
-  as?: "div" | "h1" | "h2" | "h3" | "p" | "span" | "li" | "section";
+  as?: RevealTag;
   id?: string;
 };
 
@@ -39,7 +37,7 @@ function Reveal({
   as = "div",
   id,
 }: RevealProps) {
-  const Comp = motion[as];
+  const Comp = motionMap[as];
   return (
     <Comp
       id={id}
@@ -54,40 +52,42 @@ function Reveal({
   );
 }
 
-function Arrow({ className }: { className?: string }) {
-  return (
-    <svg
-      className={`about__arrow ${className ?? ""}`}
-      viewBox="0 0 130 175"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M 105 25 C 135 22 122 70 78 62 C 38 56 65 110 70 142 L 70 158"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M 58 148 L 70 162 L 84 150"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+function useScrollRestoration(storageKey = "scroll") {
+  const { key, pathname } = useLocation();
+  const navType = useNavigationType();
 
-const story = [
-  "The Black Immigrants Community Foundation (BICF) is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building. We understand that Black immigrants often face complex and intersecting challenges that go beyond the typical struggles associated with immigration, such as racial discrimination, cultural alienation, language barriers, and limited access to critical services. These difficulties are frequently compounded by systemic inequalities that affect their ability to fully integrate and thrive in their new communities.",
-  "At BICF, we are passionate about addressing these unique barriers and providing a platform where Black immigrants can find the support they need to succeed. Whether it's navigating the immigration process, accessing legal resources, or receiving mental health support, we are here to ensure that Black immigrants have the tools and guidance they need to build a brighter future. Our programs and services are designed to be culturally relevant and responsive to the specific needs of the Black immigrant community, ensuring that individuals feel valued, heard, and supported.",
-  "We offer a broad range of services, including legal assistance, employment resources, educational support, and leadership development. Our goal is to break down the barriers that Black immigrants often face in areas such as education, employment, housing, healthcare, and social services. We also provide a safe and inclusive space for the community to connect, share their experiences, and advocate for the change that is needed to ensure greater social justice and equity for Black immigrants in society.",
-  "BICF operates on the belief that a strong, united community is the key to overcoming adversity. By fostering a sense of belonging and solidarity, we work to reduce isolation, build resilience, and promote civic engagement among Black immigrants. We also strive to amplify the voices of Black immigrants, ensuring they have a seat at the table when decisions are made that affect their lives. Our foundation acts as a bridge between Black immigrants and the broader society, helping to strengthen social ties and increase understanding.",
-  "Through advocacy, education, and partnerships with other organizations, we aim to influence policies that create a more just and inclusive environment for Black immigrants. We also seek to provide opportunities for leadership development, so that Black immigrants can become active participants in their communities and lead efforts for positive change. Our work is grounded in the principles of social justice, equality, and human dignity, and we are unwavering in our commitment to creating a world where Black immigrants can live, work, and thrive free from discrimination and inequity.",
-  "At BICF, we believe that the success of Black immigrants is essential to the broader health and prosperity of society. When Black immigrants thrive, we all thrive. Together, we are building a stronger, more inclusive community where the contributions and potential of Black immigrants are recognized, celebrated, and honored. Through our collective efforts, we can create lasting change and build a more equitable future for generations to come.",
-];
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
+    const save = () => {
+      sessionStorage.setItem(`${storageKey}:${key}`, String(window.scrollY));
+    };
+    window.addEventListener("pagehide", save);
+    window.addEventListener("beforeunload", save);
+    return () => {
+      save();
+      window.removeEventListener("pagehide", save);
+      window.removeEventListener("beforeunload", save);
+    };
+  }, [key, storageKey]);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem(`${storageKey}:${key}`);
+    if (navType === "POP" && saved !== null) {
+      const y = parseInt(saved, 10);
+      requestAnimationFrame(() => {
+        window.scrollTo(0, y);
+        requestAnimationFrame(() => window.scrollTo(0, y));
+      });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, key, navType, storageKey]);
+}
 
 const pillars = [
   {
@@ -235,7 +235,7 @@ const sponsors = [
 const heroSlides = [
   {
     label: "About / The Foundation",
-    title: ["When Black immigrants thrive,", "we all thrive."],
+    title: ["Collective growth comes from the advancement of Black immigrants."],
     body: "The Black Immigrants Community Foundation is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building.",
   },
   {
@@ -250,91 +250,101 @@ const heroSlides = [
   },
 ];
 
-export default function About() {
-  const heroRef = useRef<HTMLElement>(null);
-  const [heroVisible, setHeroVisible] = useState(true);
+const heroBackgrounds = ["/abouthero1.png", "/abouthero2.png", "/abouthero3.png"];
+
+const fullStory = [
+  "The Black Immigrants Community Foundation (BICF) is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building. We understand that Black immigrants often face complex and intersecting challenges that go beyond the typical struggles associated with immigration, such as racial discrimination, cultural alienation, language barriers, and limited access to critical services. These difficulties are frequently compounded by systemic inequalities that affect their ability to fully integrate and thrive in their new communities.",
+  "At BICF, we are passionate about addressing these unique barriers and providing a platform where Black immigrants can find the support they need to succeed. Whether it's navigating the immigration process, accessing legal resources, or receiving mental health support, we are here to ensure that Black immigrants have the tools and guidance they need to build a brighter future. Our programs and services are designed to be culturally relevant and responsive to the specific needs of the Black immigrant community, ensuring that individuals feel valued, heard, and supported.",
+  "We offer a broad range of services, including legal assistance, employment resources, educational support, and leadership development. Our goal is to break down the barriers that Black immigrants often face in areas such as education, employment, housing, healthcare, and social services. We also provide a safe and inclusive space for the community to connect, share their experiences, and advocate for the change that is needed to ensure greater social justice and equity for Black immigrants in society.",
+  "BICF operates on the belief that a strong, united community is the key to overcoming adversity. By fostering a sense of belonging and solidarity, we work to reduce isolation, build resilience, and promote civic engagement among Black immigrants. We also strive to amplify the voices of Black immigrants, ensuring they have a seat at the table when decisions are made that affect their lives. Our foundation acts as a bridge between Black immigrants and the broader society, helping to strengthen social ties and increase understanding.",
+  "Through advocacy, education, and partnerships with other organizations, we aim to influence policies that create a more just and inclusive environment for Black immigrants. We also seek to provide opportunities for leadership development, so that Black immigrants can become active participants in their communities and lead efforts for positive change. Our work is grounded in the principles of social justice, equality, and human dignity, and we are unwavering in our commitment to creating a world where Black immigrants can live, work, and thrive free from discrimination and inequity.",
+  "At BICF, we believe that the success of Black immigrants is essential to the broader health and prosperity of society. When Black immigrants thrive, we all thrive. Together, we are building a stronger, more inclusive community where the contributions and potential of Black immigrants are recognized, celebrated, and honored. Through our collective efforts, we can create lasting change and build a more equitable future for generations to come.",
+];
+
+type AboutProps = {
+  pageTitle?: string;
+  autoplayDelay?: number;
+};
+
+export default function About({
+  pageTitle = "About | Black Immigrants Community Foundation",
+  autoplayDelay = 8000,
+}: AboutProps) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [storyExpanded, setStoryExpanded] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useScrollRestoration("bicf-scroll");
 
   useEffect(() => {
-    if (!heroVisible) return;
-    const interval = setInterval(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       setActiveSlide((i) => (i + 1) % heroSlides.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [heroVisible]);
+    }, autoplayDelay);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [activeSlide, autoplayDelay]);
 
-  useEffect(() => {
-    document.title = "About | Black Immigrants Community Foundation";
-    window.scrollTo({ top: 0, behavior: "auto" });
-  }, []);
+  const goTo = (i: number) =>
+    setActiveSlide(((i % heroSlides.length) + heroSlides.length) % heroSlides.length);
 
-  useEffect(() => {
-    const node = heroRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroVisible(entry.isIntersecting),
-      { threshold: 0, rootMargin: "100px" },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      const next =
+        e.key === "ArrowRight"
+          ? (activeSlide + 1) % heroSlides.length
+          : (activeSlide - 1 + heroSlides.length) % heroSlides.length;
+      setActiveSlide(next);
+      tabsRef.current[next]?.focus();
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActiveSlide(0);
+      tabsRef.current[0]?.focus();
+    } else if (e.key === "End") {
+      e.preventDefault();
+      const last = heroSlides.length - 1;
+      setActiveSlide(last);
+      tabsRef.current[last]?.focus();
+    }
+  };
 
   return (
     <main className="about">
-      <section
-        ref={heroRef}
-        className="about__hero"
-        aria-labelledby="about-hero-title"
-      >
-        <div className="about__hero-shader" aria-hidden="true">
-          <ShaderGradientCanvas
-            style={{ width: "100%", height: "100%" }}
-            pointerEvents="none"
-          >
-            <ShaderGradient
-              animate={heroVisible ? "on" : "off"}
-              bgColor1="#000000"
-              bgColor2="#000000"
-              brightness={1.2}
-              cAzimuthAngle={180}
-              cDistance={2.4}
-              cPolarAngle={95}
-              cameraZoom={1}
-              color1="#3f0000"
-              color2="#c73c00"
-              color3="#FD4912"
-              destination="onCanvas"
-              embedMode="off"
-              envPreset="city"
-              format="gif"
-              fov={45}
-              frameRate={6}
-              gizmoHelper="hide"
-              grain="off"
-              lightType="env"
-              pixelDensity={1}
-              positionX={0}
-              positionY={-2.1}
-              positionZ={0}
-              range="disabled"
-              rangeEnd={40}
-              rangeStart={0}
-              reflection={0.1}
-              rotationX={0}
-              rotationY={0}
-              rotationZ={225}
-              shader="defaults"
-              type="waterPlane"
-              uAmplitude={0}
-              uDensity={1.8}
-              uFrequency={5.5}
-              uSpeed={0.2}
-              uStrength={3}
-              uTime={0.2}
-              wireframe={false}
-            />
-          </ShaderGradientCanvas>
-        </div>
+      <section className="about__hero" aria-labelledby="about-hero-title">
+        <svg
+          className="about__hero-defs"
+          width="0"
+          height="0"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <defs>
+            <clipPath id="bicf-hero-curve" clipPathUnits="objectBoundingBox">
+              <path d="M 0.05,0 C 0.28,0.32 0.10,0.62 0.22,1 L 1,1 L 1,0 Z" />
+            </clipPath>
+            <clipPath id="bicf-hero-curve-md" clipPathUnits="objectBoundingBox">
+              <path d="M 0.06,0 C 0.30,0.34 0.12,0.64 0.24,1 L 1,1 L 1,0 Z" />
+            </clipPath>
+            <clipPath id="bicf-hero-curve-sm" clipPathUnits="objectBoundingBox">
+              <path d="M 0,0.05 C 0.32,0.28 0.62,0.10 1,0.22 L 1,1 L 0,1 Z" />
+            </clipPath>
+          </defs>
+        </svg>
+
+        <div
+          className="about__hero-shader"
+          aria-hidden="true"
+          style={{
+            background: `url(${heroBackgrounds[activeSlide]}) center/cover no-repeat, #000`,
+          }}
+        />
         <div className="about__hero-veil" aria-hidden="true" />
 
         <div className="about__hero-panel">
@@ -342,6 +352,9 @@ export default function About() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSlide}
+                id={`hero-panel-${activeSlide}`}
+                role="tabpanel"
+                aria-labelledby={`hero-tab-${activeSlide}`}
                 className="about__hero-slide"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -368,14 +381,10 @@ export default function About() {
               <button
                 type="button"
                 className="about__hero-nav"
-                onClick={() =>
-                  setActiveSlide(
-                    (i) => (i - 1 + heroSlides.length) % heroSlides.length,
-                  )
-                }
+                onClick={() => goTo(activeSlide - 1)}
                 aria-label="Previous slide"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
                   <path
                     d="M15 6L9 12L15 18"
                     stroke="currentColor"
@@ -390,13 +399,20 @@ export default function About() {
                 className="about__hero-bars"
                 role="tablist"
                 aria-label="Hero slides"
+                onKeyDown={onTabsKeyDown}
               >
                 {heroSlides.map((_, i) => (
                   <button
                     key={i}
+                    ref={(el) => {
+                      tabsRef.current[i] = el;
+                    }}
                     type="button"
                     role="tab"
+                    id={`hero-tab-${i}`}
+                    aria-controls={`hero-panel-${i}`}
                     aria-selected={i === activeSlide}
+                    tabIndex={i === activeSlide ? 0 : -1}
                     aria-label={`Go to slide ${i + 1}`}
                     className={`about__hero-bar ${
                       i === activeSlide ? "about__hero-bar--active" : ""
@@ -409,12 +425,10 @@ export default function About() {
               <button
                 type="button"
                 className="about__hero-nav"
-                onClick={() =>
-                  setActiveSlide((i) => (i + 1) % heroSlides.length)
-                }
+                onClick={() => goTo(activeSlide + 1)}
                 aria-label="Next slide"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
                   <path
                     d="M9 6L15 12L9 18"
                     stroke="currentColor"
@@ -433,28 +447,9 @@ export default function About() {
             </div>
           </div>
         </div>
-
-        <svg
-          className="about__hero-tear"
-          viewBox="0 0 1440 80"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path d="M0,32 C300,8 720,60 1080,30 C1260,16 1380,42 1440,22 L1440,80 L0,80 Z" />
-        </svg>
       </section>
 
       <section className="about__story" aria-labelledby="about-story-title">
-        <motion.div
-          className="about__story-arrow"
-          initial={{ opacity: 0.5, scale: 0.92, rotate: -8 }}
-          whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease, delay: 0.2 }}
-          aria-hidden="true"
-        >
-          <Arrow />
-        </motion.div>
         <div className="about__container">
           <header className="about__section-head">
             <Reveal as="span" className="about__kicker">
@@ -473,35 +468,45 @@ export default function About() {
           <div className="about__story-body">
             <Reveal as="p" delay={0}>
               The Black Immigrants Community Foundation (BICF) is a nonprofit
-              organization committed to supporting and empowering Black
-              immigrants through advocacy, resources, and community building. We
-              understand that Black immigrants often face complex and
-              intersecting challenges that go beyond the typical struggles
-              associated with immigration, such as racial discrimination,
-              cultural alienation, language barriers, and limited access to
-              critical services. These difficulties are frequently compounded by
-              systemic inequalities that affect their ability to fully integrate
-              and thrive in their new communities.
+              organization committed to empowering Black immigrants through
+              advocacy, resources, and community building. We understand the
+              intersecting challenges Black immigrants face — from racial
+              discrimination and cultural alienation to systemic barriers that
+              hinder integration and success.
             </Reveal>
 
-            {story.slice(1).map((para, i) => (
-              <Reveal as="p" key={i + 1} delay={(i + 1) * 0.05}>
-                {para}
-              </Reveal>
-            ))}
+            {storyExpanded && (
+              <>
+                <Reveal as="p" delay={0.1}>
+                  At BICF, we provide culturally responsive programs and support
+                  to ensure Black immigrants not only survive but thrive in
+                  their new communities. Our work is rooted in dignity, equity,
+                  and the belief that collective growth comes when everyone has
+                  the opportunity to succeed.
+                </Reveal>
+                {fullStory.map((para, i) => (
+                  <Reveal as="p" key={i} delay={0.15 + i * 0.05}>
+                    {para}
+                  </Reveal>
+                ))}
+              </>
+            )}
+
+            <div className="about__story-button-wrapper">
+              <button
+                type="button"
+                className="about__story-btn"
+                aria-expanded={storyExpanded}
+                onClick={() => setStoryExpanded(!storyExpanded)}
+              >
+                {storyExpanded ? "Show Less" : "Learn More"}
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="about__pillars" aria-labelledby="about-pillars-title">
-        <svg
-          className="about__wave about__wave--pillars"
-          viewBox="0 0 1440 80"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path d="M0,55 C240,15 540,75 840,40 C1080,12 1260,55 1440,30 L1440,80 L0,80 Z" />
-        </svg>
         <div className="about__pillars-aurora" aria-hidden="true" />
         <div className="about__container">
           <header className="about__section-head">
@@ -530,10 +535,10 @@ export default function About() {
                 transition={{ duration: 0.95, ease, delay: i * 0.06 }}
               >
                 <div className="about__pillar-media">
-                  <img src={p.image} alt="" loading="lazy" />
+                  <img src={p.image} alt={`${p.label} — ${p.tag}`} loading="lazy" />
                   <span className="about__pillar-badge">
                     <span className="about__pillar-badge-num">
-                      {String(i + 1).padStart(2, "00")}
+                      {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="about__pillar-badge-text">{p.tag}</span>
                   </span>
@@ -588,11 +593,7 @@ export default function About() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-8%" }}
-                transition={{
-                  duration: 0.75,
-                  ease,
-                  delay: (i % 2) * 0.06,
-                }}
+                transition={{ duration: 0.75, ease, delay: (i % 2) * 0.06 }}
               >
                 <span className="about__value-num">
                   {String(i + 1).padStart(2, "0")}
@@ -605,18 +606,7 @@ export default function About() {
         </div>
       </section>
 
-      <section
-        className="about__services"
-        aria-labelledby="about-services-title"
-      >
-        <svg
-          className="about__wave about__wave--services"
-          viewBox="0 0 1440 80"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path d="M0,40 C180,60 420,30 720,40 C1020,50 1260,20 1440,55 L1440,80 L0,80 Z" />
-        </svg>
+      <section className="about__services" aria-labelledby="about-services-title">
         <div className="about__container">
           <header className="about__section-head">
             <Reveal as="span" className="about__kicker">
@@ -683,6 +673,7 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.9, ease, delay: i * 0.08 }}
+                tabIndex={0}
               >
                 <img src={item.src} alt={item.label} loading="lazy" />
                 <span className="about__gallery-index" aria-hidden="true">
@@ -699,10 +690,7 @@ export default function About() {
         </div>
       </section>
 
-      <section
-        className="about__sponsors"
-        aria-labelledby="about-sponsors-title"
-      >
+      <section className="about__sponsors" aria-labelledby="about-sponsors-title">
         <div className="about__container">
           <header className="about__section-head about__section-head--center">
             <Reveal as="span" className="about__kicker">

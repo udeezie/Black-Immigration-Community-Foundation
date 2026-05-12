@@ -127,13 +127,6 @@ $max-w: 1280px;
     font-style: normal;
   }
 
-  &__separator {
-    width: 100%;
-    height: 1px;
-    background: var(--color-border);
-    margin-top: 8px;
-  }
-
   &__socials {
     display: flex;
     flex-wrap: wrap;
@@ -356,7 +349,6 @@ $max-w: 1280px;
   &__faqs {
     margin-top: 160px;
     padding-top: 120px;
-    border-top: 1px solid var(--color-border);
 
     @media (max-width: 1100px) {
       margin-top: 120px;
