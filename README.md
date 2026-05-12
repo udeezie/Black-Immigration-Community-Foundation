@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -71,3 +72,7 @@ export default defineConfig([
   },
 ])
 ```
+=======
+# Black-Immigration-Community-Foundation
+Black Immigrants Community Foundation 
+>>>>>>> a51ece3965407468f8facb92af73d76618590abf
