@@ -326,26 +326,6 @@ export default function About({
   return (
     <main className="about">
       <section className="about__hero" aria-labelledby="about-hero-title">
-        <svg
-          className="about__hero-defs"
-          width="0"
-          height="0"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <defs>
-            <clipPath id="bicf-hero-curve" clipPathUnits="objectBoundingBox">
-              <path d="M 0.05,0 C 0.28,0.32 0.10,0.62 0.22,1 L 1,1 L 1,0 Z" />
-            </clipPath>
-            <clipPath id="bicf-hero-curve-md" clipPathUnits="objectBoundingBox">
-              <path d="M 0.06,0 C 0.30,0.34 0.12,0.64 0.24,1 L 1,1 L 1,0 Z" />
-            </clipPath>
-            <clipPath id="bicf-hero-curve-sm" clipPathUnits="objectBoundingBox">
-              <path d="M 0,0.05 C 0.32,0.28 0.62,0.10 1,0.22 L 1,1 L 0,1 Z" />
-            </clipPath>
-          </defs>
-        </svg>
-
         <div
           className="about__hero-shader"
           aria-hidden="true"
