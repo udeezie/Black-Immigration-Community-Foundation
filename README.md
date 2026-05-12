@@ -1,2 +1,2 @@
 # Black-Immigration-Community-Foundation
-Black Immigrants Community Foundation – React + TypeScript
+Black Immigrants Community Foundation 
