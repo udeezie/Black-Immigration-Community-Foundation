@@ -235,7 +235,9 @@ const sponsors = [
 const heroSlides = [
   {
     label: "About / The Foundation",
-    title: ["Collective growth comes from the advancement of Black immigrants."],
+    title: [
+      "Collective growth comes from the advancement of Black immigrants.",
+    ],
     body: "The Black Immigrants Community Foundation is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building.",
   },
   {
@@ -250,7 +252,11 @@ const heroSlides = [
   },
 ];
 
-const heroBackgrounds = ["/abouthero1.png", "/abouthero2.png", "/abouthero3.png"];
+const heroBackgrounds = [
+  "/abouthero1.png",
+  "/abouthero2.png",
+  "/abouthero3.png",
+];
 
 const fullStory = [
   "The Black Immigrants Community Foundation (BICF) is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building. We understand that Black immigrants often face complex and intersecting challenges that go beyond the typical struggles associated with immigration, such as racial discrimination, cultural alienation, language barriers, and limited access to critical services. These difficulties are frequently compounded by systemic inequalities that affect their ability to fully integrate and thrive in their new communities.",
@@ -292,7 +298,9 @@ export default function About({
   }, [activeSlide, autoplayDelay]);
 
   const goTo = (i: number) =>
-    setActiveSlide(((i % heroSlides.length) + heroSlides.length) % heroSlides.length);
+    setActiveSlide(
+      ((i % heroSlides.length) + heroSlides.length) % heroSlides.length,
+    );
 
   const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
@@ -384,7 +392,13 @@ export default function About({
                 onClick={() => goTo(activeSlide - 1)}
                 aria-label="Previous slide"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  aria-hidden="true"
+                >
                   <path
                     d="M15 6L9 12L15 18"
                     stroke="currentColor"
@@ -428,7 +442,13 @@ export default function About({
                 onClick={() => goTo(activeSlide + 1)}
                 aria-label="Next slide"
               >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  aria-hidden="true"
+                >
                   <path
                     d="M9 6L15 12L9 18"
                     stroke="currentColor"
@@ -535,7 +555,11 @@ export default function About({
                 transition={{ duration: 0.95, ease, delay: i * 0.06 }}
               >
                 <div className="about__pillar-media">
-                  <img src={p.image} alt={`${p.label} — ${p.tag}`} loading="lazy" />
+                  <img
+                    src={p.image}
+                    alt={`${p.label} — ${p.tag}`}
+                    loading="lazy"
+                  />
                   <span className="about__pillar-badge">
                     <span className="about__pillar-badge-num">
                       {String(i + 1).padStart(2, "0")}
@@ -606,7 +630,10 @@ export default function About({
         </div>
       </section>
 
-      <section className="about__services" aria-labelledby="about-services-title">
+      <section
+        className="about__services"
+        aria-labelledby="about-services-title"
+      >
         <div className="about__container">
           <header className="about__section-head">
             <Reveal as="span" className="about__kicker">
@@ -690,7 +717,10 @@ export default function About({
         </div>
       </section>
 
-      <section className="about__sponsors" aria-labelledby="about-sponsors-title">
+      <section
+        className="about__sponsors"
+        aria-labelledby="about-sponsors-title"
+      >
         <div className="about__container">
           <header className="about__section-head about__section-head--center">
             <Reveal as="span" className="about__kicker">

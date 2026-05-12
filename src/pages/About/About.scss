@@ -57,7 +57,7 @@ $max-w-prose: 880px;
 
   &__section-title {
     font-family: $font-display;
-    font-size: clamp(1.85rem, 4.4vw, 3.8rem);
+    font-size: clamp(1.65rem, 4.4vw, 3.8rem);
     font-weight: 500;
     line-height: 1.08;
     letter-spacing: -0.018em;
@@ -74,7 +74,9 @@ $max-w-prose: 880px;
     margin: 0;
 
     @media (max-width: 900px) {
-      min-height: 100svh;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
     }
   }
 
@@ -92,6 +94,16 @@ $max-w-prose: 880px;
     z-index: 0;
     pointer-events: none;
     transition: background 0.5s ease;
+
+    @media (max-width: 900px) {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      height: 42svh;
+      min-height: 260px;
+      max-height: 420px;
+      flex-shrink: 0;
+    }
   }
 
   &__hero-veil {
@@ -106,6 +118,19 @@ $max-w-prose: 880px;
       rgba(0, 0, 0, 0) 70%,
       rgba(0, 0, 0, 0.55) 100%
     );
+
+    @media (max-width: 900px) {
+      bottom: auto;
+      top: 0;
+      height: 42svh;
+      max-height: 420px;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.95) 100%
+      );
+    }
   }
 
   &__hero-panel {
@@ -126,13 +151,17 @@ $max-w-prose: 880px;
     }
 
     @media (max-width: 900px) {
+      position: relative;
       top: auto;
-      bottom: 0;
+      bottom: auto;
+      right: auto;
       width: 100%;
       height: auto;
-      max-height: 78%;
-      -webkit-clip-path: url(#bicf-hero-curve-sm);
-      clip-path: url(#bicf-hero-curve-sm);
+      max-height: none;
+      flex: 1 1 auto;
+      -webkit-clip-path: none;
+      clip-path: none;
+      border-top: 1px solid rgba(var(--color-accent-rgb), 0.18);
     }
   }
 
@@ -157,8 +186,8 @@ $max-w-prose: 880px;
       transform: none;
       left: auto;
       right: auto;
-      padding: 64px 24px 40px;
-      gap: 20px;
+      padding: 40px 24px 44px;
+      gap: 22px;
     }
   }
 
@@ -166,6 +195,10 @@ $max-w-prose: 880px;
     display: flex;
     flex-direction: column;
     gap: clamp(16px, 1.8vw, 24px);
+
+    @media (max-width: 900px) {
+      gap: 18px;
+    }
   }
 
   &__hero-label {
@@ -179,9 +212,9 @@ $max-w-prose: 880px;
 
   &__hero-title {
     font-family: $font-display;
-    font-size: clamp(2rem, 5.4vw, 4.6rem);
+    font-size: clamp(1.9rem, 7.5vw, 4.6rem);
     font-weight: 600;
-    line-height: 1.05;
+    line-height: 1.06;
     letter-spacing: -0.02em;
     margin: 0;
     color: var(--color-text);
@@ -200,7 +233,7 @@ $max-w-prose: 880px;
     max-width: 52ch;
     font-family: $font-body;
     font-size: clamp(0.9rem, 1vw, 1.05rem);
-    line-height: 1.7;
+    line-height: 1.65;
     font-weight: 300;
     color: rgba(238, 234, 228, 0.74);
     text-wrap: pretty;
@@ -209,8 +242,8 @@ $max-w-prose: 880px;
   &__hero-controls {
     display: flex;
     align-items: center;
-    gap: clamp(12px, 1.4vw, 20px);
-    margin-top: 8px;
+    gap: clamp(10px, 1.4vw, 20px);
+    margin-top: 4px;
   }
 
   &__hero-nav {
@@ -224,6 +257,7 @@ $max-w-prose: 880px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     transition:
       border-color 0.25s ease,
       color 0.25s ease,
@@ -246,6 +280,7 @@ $max-w-prose: 880px;
     align-items: center;
     gap: 8px;
     flex: 1;
+    min-width: 0;
   }
 
   &__hero-bar {
@@ -256,6 +291,7 @@ $max-w-prose: 880px;
     cursor: pointer;
     padding: 0;
     border-radius: 2px;
+    min-width: 0;
     transition:
       background 0.3s ease,
       height 0.3s ease;
@@ -276,10 +312,10 @@ $max-w-prose: 880px;
   }
 
   &__hero-meta {
-    margin-top: 8px;
+    margin-top: 4px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 14px;
+    gap: 6px 14px;
     font-family: $font-ui;
     font-size: clamp(0.6rem, 0.74vw, 0.625rem);
     letter-spacing: 0.28em;
@@ -294,7 +330,7 @@ $max-w-prose: 880px;
   &__story {
     background: #000;
     color: #fafaf6;
-    padding-block: clamp(64px, 10vw, 140px);
+    padding-block: clamp(56px, 10vw, 140px);
     position: relative;
     margin: 0;
 
@@ -309,10 +345,10 @@ $max-w-prose: 880px;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
-    gap: clamp(20px, 2.2vw, 28px);
+    gap: clamp(18px, 2.2vw, 28px);
     font-family: $font-body;
     font-size: clamp(0.95rem, 1.18vw, 1.15rem);
-    line-height: 1.75;
+    line-height: 1.7;
     font-weight: 400;
     color: rgba(238, 234, 228, 0.85);
 
@@ -324,7 +360,7 @@ $max-w-prose: 880px;
     p:first-child {
       font-size: clamp(1rem, 1.3vw, 1.25rem);
       font-weight: 400;
-      line-height: 1.7;
+      line-height: 1.65;
       color: #fafaf6;
     }
   }
@@ -365,7 +401,7 @@ $max-w-prose: 880px;
 
   &__pillars {
     background: #14110d;
-    padding: clamp(80px, 12vw, 180px) 0;
+    padding: clamp(64px, 12vw, 180px) 0;
     position: relative;
     isolation: isolate;
     margin: 0;
@@ -516,6 +552,8 @@ $max-w-prose: 880px;
     position: relative;
     overflow: hidden;
     background: #0e0c09;
+    width: 100%;
+    height: 100%;
     min-height: 320px;
 
     img {
@@ -561,12 +599,12 @@ $max-w-prose: 880px;
 
     @media (max-width: 900px) {
       aspect-ratio: 4 / 3;
-      min-height: 280px;
+      height: auto;
+      min-height: 0;
     }
 
     @media (max-width: 600px) {
       aspect-ratio: 5 / 6;
-      min-height: 360px;
     }
   }
 
@@ -611,7 +649,7 @@ $max-w-prose: 880px;
   }
 
   &__pillar-content {
-    padding: clamp(32px, 4.6vw, 64px) clamp(28px, 4.6vw, 64px);
+    padding: clamp(28px, 4.6vw, 64px) clamp(24px, 4.6vw, 64px);
     display: flex;
     flex-direction: column;
     gap: clamp(14px, 1.8vw, 22px);
@@ -640,7 +678,7 @@ $max-w-prose: 880px;
 
   &__pillar-label {
     font-family: $font-display;
-    font-size: clamp(1.7rem, 4.6vw, 3.2rem);
+    font-size: clamp(1.65rem, 4.6vw, 3.2rem);
     font-weight: 500;
     line-height: 1.04;
     letter-spacing: -0.02em;
@@ -653,7 +691,7 @@ $max-w-prose: 880px;
   &__pillar-body {
     font-family: $font-body;
     font-size: clamp(0.95rem, 1.05vw, 1.08rem);
-    line-height: 1.75;
+    line-height: 1.7;
     font-weight: 300;
     color: rgba(238, 234, 228, 0.7);
     margin: 0;
@@ -681,7 +719,7 @@ $max-w-prose: 880px;
 
   &__values {
     background: var(--color-bg);
-    padding-block: clamp(64px, 10vw, 140px);
+    padding-block: clamp(56px, 10vw, 140px);
     margin: 0;
   }
 
@@ -701,7 +739,8 @@ $max-w-prose: 880px;
 
   &__value {
     position: relative;
-    padding: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 32px) clamp(28px, 4vw, 48px) 0;
+    padding: clamp(28px, 4vw, 48px) clamp(20px, 3vw, 32px)
+      clamp(28px, 4vw, 48px) 0;
     border-bottom: 1px solid var(--color-border);
     display: grid;
     grid-template-columns: clamp(56px, 7vw, 80px) 1fr;
@@ -778,7 +817,7 @@ $max-w-prose: 880px;
 
   &__services {
     background: #14110d;
-    padding: clamp(80px, 12vw, 180px) 0;
+    padding: clamp(64px, 12vw, 180px) 0;
     position: relative;
     margin: 0;
   }
@@ -872,7 +911,7 @@ $max-w-prose: 880px;
 
   &__gallery {
     background: #0e0c09;
-    padding-block: clamp(64px, 10vw, 140px);
+    padding-block: clamp(56px, 10vw, 140px);
     position: relative;
     overflow: hidden;
     isolation: isolate;
@@ -1084,7 +1123,7 @@ $max-w-prose: 880px;
   &__sponsors {
     background: #000;
     color: #fafaf6;
-    padding-block: clamp(64px, 10vw, 140px);
+    padding-block: clamp(56px, 10vw, 140px);
     position: relative;
     margin: 0;
 
@@ -1099,7 +1138,7 @@ $max-w-prose: 880px;
     margin: clamp(-24px, -3vw, -40px) auto clamp(48px, 7vw, 80px);
     font-family: $font-body;
     font-size: clamp(0.95rem, 1.18vw, 1.18rem);
-    line-height: 1.75;
+    line-height: 1.7;
     font-weight: 400;
     color: rgba(238, 234, 228, 0.75);
     text-align: center;
