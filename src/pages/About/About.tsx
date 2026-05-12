@@ -235,9 +235,7 @@ const sponsors = [
 const heroSlides = [
   {
     label: "About / The Foundation",
-    title: [
-      "Collective growth comes from the advancement of Black immigrants.",
-    ],
+    title: ["Growth powered by Black immigrants."],
     body: "The Black Immigrants Community Foundation is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building.",
   },
   {
