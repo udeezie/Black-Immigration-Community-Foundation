@@ -19,7 +19,7 @@ export default function Footer() {
               </h2>
               <div className="footer__actions">
                 <Link to="/volunteer" className="footer__btn">Volunteer With Us</Link>
-                <Link to="/contact" className="footer__btn footer__btn--ghost">Get In Touch</Link>
+                <Link to="/donate" className="footer__btn footer__btn--ghost">Donate</Link>
               </div>
             </div>
 

@@ -15,6 +15,7 @@ const mainLinks = [
 
 const quickLinks = [
   { label: "Volunteer", to: "/volunteer" },
+  { label: "Donate", to: "/donate" },
   { label: "Careers", to: "/careers" },
 ];
 
@@ -191,8 +192,15 @@ export default function Navbar() {
               <span className={styles.label}>Get In Touch</span>
               <div className={styles.ctaGroup}>
                 <NavLink
-                  to="/contact"
+                  to="/donate"
                   className={styles.ctaFilled}
+                  onClick={close}
+                >
+                  Donate Now
+                </NavLink>
+                <NavLink
+                  to="/contact"
+                  className={styles.ctaOutline}
                   onClick={close}
                 >
                   Contact Us

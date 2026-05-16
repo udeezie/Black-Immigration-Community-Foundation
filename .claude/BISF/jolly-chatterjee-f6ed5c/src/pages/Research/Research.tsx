@@ -18,14 +18,7 @@ import {
 } from "framer-motion";
 import "./Research.scss";
 
-const IMAGES = [
-  "/r1.png",
-  "/r2.png",
-  "/r3.png",
-  "/r4.png",
-  "/r5.png",
-  "/r6.png",
-];
+const IMAGES = ["/r1.png", "/r2.png", "/r3.png", "/r4.png", "/r5.png", "/r6.png"];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -222,9 +215,7 @@ function ClosingImage({ src }: { src: string }) {
       ref={ref}
       className="r__closing-media"
       initial={{ opacity: 0, scale: 0.96 }}
-      animate={
-        revealed ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }
-      }
+      animate={revealed ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
       transition={{ duration: 1, ease: EASE }}
     >
       <img src={src} alt="" loading="lazy" />
@@ -358,7 +349,10 @@ export default function Research() {
         </div>
       </section>
 
-      <section className="r__panel r__panel--right" aria-labelledby="r-cfactor">
+      <section
+        className="r__panel r__panel--right"
+        aria-labelledby="r-cfactor"
+      >
         <div className="r__panel-body">
           <Reveal as="span" className="r__panel-num">
             02
