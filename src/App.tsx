@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Home from "./pages/Home/Home";
-import About from "./pages/About/About";
-import Contact from "./pages/Contact/Contact";
-import Research from "./pages/Research/Research";
 import Loader from "./components/Loader/Loader";
 import "./App.scss";
+
+const About = lazy(() => import("./pages/About/About"));
+const Services = lazy(() => import("./pages/Services/Services"));
+const Research = lazy(() => import("./pages/Research/Research"));
+const Contact = lazy(() => import("./pages/Contact/Contact"));
 
 function SmoothScroll() {
   const { pathname } = useLocation();
@@ -30,43 +32,37 @@ function SmoothScroll() {
     };
     rafId = requestAnimationFrame(raf);
 
-    (window as unknown as { lenis?: Lenis }).lenis = lenis;
+    (window as any).lenis = lenis;
 
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
-      delete (window as unknown as { lenis?: Lenis }).lenis;
+      delete (window as any).lenis;
     };
   }, []);
 
   useEffect(() => {
-    const lenis = (window as unknown as { lenis?: Lenis }).lenis;
-    if (lenis) lenis.scrollTo(0, { immediate: true });
+    if ((window as any).lenis)
+      (window as any).lenis.scrollTo(0, { immediate: true });
   }, [pathname]);
 
   return null;
 }
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) return <Loader />;
-
   return (
     <>
       <SmoothScroll />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/research" element={<Research />} />
-        <Route path="/contact" element={<Contact />} />
-      </Routes>
+      <Suspense fallback={<Loader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </Suspense>
       <Footer />
     </>
   );

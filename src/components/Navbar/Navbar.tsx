@@ -1,21 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext";
 import styles from "./Navbar.module.scss";
 
 const RADIUS = 24;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const mainLinks = [
-  { label: "Home", to: "/", end: true },
-  { label: "About", to: "/about", end: false },
-  { label: "Services", to: "/services", end: false },
-  { label: "Research", to: "/research", end: false },
-  { label: "Contact", to: "/contact", end: false },
+  { label: { en: "Home", fr: "Accueil" }, to: "/", end: true },
+  { label: { en: "About", fr: "À Propos" }, to: "/about", end: false },
+  { label: { en: "Services", fr: "Services" }, to: "/services", end: false },
+  { label: { en: "Research", fr: "Recherche" }, to: "/research", end: false },
+  { label: { en: "Contact", fr: "Contact" }, to: "/contact", end: false },
 ];
 
 const quickLinks = [
-  { label: "Volunteer", to: "/volunteer" },
-  { label: "Careers", to: "/careers" },
+  { label: { en: "Volunteer", fr: "Bénévolat" }, to: "/volunteer" },
+  { label: { en: "Careers", fr: "Carrières" }, to: "/careers" },
 ];
 
 const socialLinks = [
@@ -71,6 +72,7 @@ const socialLinks = [
 ];
 
 export default function Navbar() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -117,16 +119,37 @@ export default function Navbar() {
         ].join(" ")}
       >
         <div className={styles.headerInner}>
-          <NavLink to="/" className={styles.logo} onClick={close}>
-            <span className={styles.logoMain}>BICF</span>
-            <span className={styles.logoSub}>
-              Black Immigrants Community Foundation
+          <NavLink to="/" className={styles.logo} onClick={close} aria-label="Black Immigrants Community Foundation, Home">
+            <svg
+              className={styles.logoMark}
+              viewBox="0 0 32 32"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M5 25 L12 25 L12 18 L19 18 L19 11 L26 11"
+                stroke="currentColor"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="26" cy="11" r="3" fill="currentColor" />
+            </svg>
+            <span className={styles.logoWords}>
+              <span className={styles.logoMain}>BICF</span>
+              <span className={styles.logoSub}>
+                Black Immigrants Community Foundation
+              </span>
             </span>
           </NavLink>
 
           <label
             className={styles.hamburger}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={
+              open
+                ? t({ en: "Close menu", fr: "Fermer le menu" })
+                : t({ en: "Open menu", fr: "Ouvrir le menu" })
+            }
           >
             <input type="checkbox" checked={open} onChange={toggleMenu} />
             <svg viewBox="0 0 32 32">
@@ -147,7 +170,7 @@ export default function Navbar() {
         {open && (
           <div className={styles.overlayGrid}>
             <div className={styles.cell}>
-              <span className={styles.label}>Main</span>
+              <span className={styles.label}>{t({ en: "Main", fr: "Menu" })}</span>
               <nav className={styles.mainNav}>
                 {mainLinks.map((link, i) => (
                   <NavLink
@@ -160,14 +183,16 @@ export default function Navbar() {
                     onClick={close}
                     style={{ animationDelay: `${i * 70}ms` }}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </NavLink>
                 ))}
               </nav>
             </div>
 
             <div className={styles.cell}>
-              <span className={styles.label}>Quick Links</span>
+              <span className={styles.label}>
+                {t({ en: "Quick Links", fr: "Liens Rapides" })}
+              </span>
               <nav className={styles.quickNav}>
                 {quickLinks.map((link, i) => (
                   <NavLink
@@ -181,27 +206,31 @@ export default function Navbar() {
                       animationDelay: `${(mainLinks.length + i) * 70}ms`,
                     }}
                   >
-                    {link.label}
+                    {t(link.label)}
                   </NavLink>
                 ))}
               </nav>
             </div>
 
             <div className={styles.cell}>
-              <span className={styles.label}>Get In Touch</span>
+              <span className={styles.label}>
+                {t({ en: "Get In Touch", fr: "Nous Joindre" })}
+              </span>
               <div className={styles.ctaGroup}>
                 <NavLink
                   to="/contact"
                   className={styles.ctaFilled}
                   onClick={close}
                 >
-                  Contact Us
+                  {t({ en: "Contact Us", fr: "Nous Contacter" })}
                 </NavLink>
               </div>
             </div>
 
             <div className={`${styles.cell} ${styles.cellBottom}`}>
-              <span className={styles.label}>Follow Us</span>
+              <span className={styles.label}>
+                {t({ en: "Follow Us", fr: "Suivez-nous" })}
+              </span>
               <div className={styles.socialRow}>
                 {socialLinks.map((s) => (
                   <a
@@ -219,7 +248,9 @@ export default function Navbar() {
             </div>
 
             <div className={`${styles.cell} ${styles.cellBottom}`}>
-              <span className={styles.label}>Visit Us</span>
+              <span className={styles.label}>
+                {t({ en: "Visit Us", fr: "Nous Visiter" })}
+              </span>
               <address className={styles.address}>
                 190 Harwood Avenue South,
                 <br />
@@ -239,7 +270,7 @@ export default function Navbar() {
       <button
         className={`${styles.backToTop} ${scrolled && !open ? styles.backToTopVisible : ""}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        aria-label="Back to top"
+        aria-label={t({ en: "Back to top", fr: "Retour en haut" })}
       >
         <svg
           width="56"

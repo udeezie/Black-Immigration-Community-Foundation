@@ -6,13 +6,16 @@ import {
   type FormEvent,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLanguage, type Lang } from "../../context/LanguageContext";
 import "./Contact.scss";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 
+type Bi = Record<Lang, string>;
+
 type Field = "name" | "email" | "phone" | "subject" | "inquiry" | "message";
 type FormState = Record<Field, string>;
-type FormErrors = Partial<Record<Field, string>>;
+type FormErrors = Partial<Record<Field, Bi>>;
 
 const initial: FormState = {
   name: "",
@@ -23,72 +26,124 @@ const initial: FormState = {
   message: "",
 };
 
-const inquiryOptions = [
-  "General Inquiry",
-  "Volunteer",
-  "Partnership",
-  "Media",
-  "Donation",
-  "Other",
+const inquiryOptions: { value: string; label: Bi }[] = [
+  { value: "General Inquiry", label: { en: "General Inquiry", fr: "Demande générale" } },
+  { value: "Volunteer", label: { en: "Volunteer", fr: "Bénévolat" } },
+  { value: "Partnership", label: { en: "Partnership", fr: "Partenariat" } },
+  { value: "Media", label: { en: "Media", fr: "Médias" } },
+  { value: "Donation", label: { en: "Donation", fr: "Don" } },
+  { value: "Other", label: { en: "Other", fr: "Autre" } },
 ];
 
-const faqs = [
+const faqs: { q: Bi; a: Bi }[] = [
   {
-    q: "Who is eligible to access BICF's programs?",
-    a: "Our work is for Black immigrants and their families navigating life in Canada. Whether you arrived last week, last decade, or were raised here as part of the second generation, you are welcome to reach out. We do not require proof of status to begin a conversation.",
+    q: {
+      en: "Who is eligible to access BICF's programs?",
+      fr: "Qui peut accéder aux programmes de la BICF?",
+    },
+    a: {
+      en: "Our work is for Black immigrants and their families navigating life in Canada. Whether you arrived last week, last decade, or were raised here as part of the second generation, you are welcome to reach out. We do not require proof of status to begin a conversation.",
+      fr: "Notre travail s'adresse aux immigrants noirs et à leurs familles qui bâtissent leur vie au Canada. Que vous soyez arrivé la semaine dernière, il y a dix ans, ou que vous ayez grandi ici dans la deuxième génération, vous êtes les bienvenus. Aucune preuve de statut n'est exigée pour entamer une conversation.",
+    },
   },
   {
-    q: "Are your services free of charge?",
-    a: "Yes. Every program at BICF, from legal counsel and immigration support to mental health referrals, education, and employment pathways, is offered at no cost to the people we serve. Our work is funded by grants, individual donors, and community partnerships.",
+    q: {
+      en: "Are your services free of charge?",
+      fr: "Vos services sont-ils gratuits?",
+    },
+    a: {
+      en: "Yes. Every program at BICF, from legal counsel and immigration support to mental health referrals, education, and employment pathways, is offered at no cost to the people we serve. Our work is funded by grants, individual donors, and community partnerships.",
+      fr: "Oui. Chaque programme de la BICF, du conseil juridique et du soutien en immigration aux références en santé mentale, à l'éducation et aux parcours d'emploi, est offert sans frais aux personnes que nous accompagnons. Notre travail est financé par des subventions, des donateurs individuels et des partenariats communautaires.",
+    },
   },
   {
-    q: "How quickly will I hear back after I get in touch?",
-    a: "For non urgent enquiries, you will hear from us within one business day. For matters tied to a court date, an immigration deadline, or an immediate safety concern, please call us directly at (905) 931 3776 so we can route you to the right person without delay.",
+    q: {
+      en: "How quickly will I hear back after I get in touch?",
+      fr: "Dans quel délai recevrai-je une réponse?",
+    },
+    a: {
+      en: "For non urgent enquiries, you will hear from us within one business day. For matters tied to a court date, an immigration deadline, or an immediate safety concern, please call us directly at (905) 931 3776 so we can route you to the right person without delay.",
+      fr: "Pour les demandes non urgentes, vous aurez de nos nouvelles en un jour ouvrable. Pour toute question liée à une date d'audience, à une échéance d'immigration ou à une préoccupation de sécurité immédiate, veuillez nous appeler directement au (905) 931 3776 afin que nous puissions vous orienter sans délai.",
+    },
   },
   {
-    q: "Do you offer support remotely, or only in person?",
-    a: "Both. Our Ajax office is open for in person consultations, and we offer phone, video, and email support for clients across the GTA and beyond. We will match the format to whatever makes the process feel less heavy.",
+    q: {
+      en: "Do you offer support remotely, or only in person?",
+      fr: "Offrez-vous du soutien à distance ou seulement en personne?",
+    },
+    a: {
+      en: "Both. Our Ajax office is open for in person consultations, and we offer phone, video, and email support for clients across the GTA and beyond. We will match the format to whatever makes the process feel less heavy.",
+      fr: "Les deux. Notre bureau d'Ajax est ouvert pour les consultations en personne, et nous offrons du soutien par téléphone, vidéo et courriel aux clients de la grande région de Toronto et au-delà. Nous adaptons le format à ce qui rend la démarche plus légère pour vous.",
+    },
   },
   {
-    q: "What languages can you support clients in?",
-    a: "Our staff and partner network can support clients in English, French, and several West African and Caribbean languages. Where we do not have a fluent speaker on the team, we work with vetted community interpreters at no cost to you.",
+    q: {
+      en: "What languages can you support clients in?",
+      fr: "Dans quelles langues pouvez-vous accompagner les clients?",
+    },
+    a: {
+      en: "Our staff and partner network can support clients in English, French, and several West African and Caribbean languages. Where we do not have a fluent speaker on the team, we work with vetted community interpreters at no cost to you.",
+      fr: "Notre équipe et notre réseau de partenaires peuvent accompagner les clients en anglais, en français et dans plusieurs langues ouest-africaines et caribéennes. Lorsque nous n'avons pas de personne maîtrisant la langue, nous faisons appel à des interprètes communautaires accrédités, sans frais pour vous.",
+    },
   },
   {
-    q: "How can I get involved as a volunteer?",
-    a: "We bring on volunteers across our legal, education, mental health, and community engagement programs. Send us a note through this form selecting Volunteer as the inquiry type, and our programs team will follow up with an intake call and current openings.",
+    q: {
+      en: "How can I get involved as a volunteer?",
+      fr: "Comment puis-je m'impliquer comme bénévole?",
+    },
+    a: {
+      en: "We bring on volunteers across our legal, education, mental health, and community engagement programs. Send us a note through this form selecting Volunteer as the inquiry type, and our programs team will follow up with an intake call and current openings.",
+      fr: "Nous accueillons des bénévoles dans nos programmes juridiques, éducatifs, de santé mentale et d'engagement communautaire. Envoyez-nous un message via ce formulaire en choisissant Bénévolat comme type de demande, et notre équipe des programmes vous recontactera avec un appel d'accueil et les postes disponibles.",
+    },
   },
   {
-    q: "Are donations to BICF tax deductible?",
-    a: "Yes. BICF is a registered Canadian non profit, and donations made through our official channels are eligible for a charitable tax receipt. Receipts are issued by email at the start of each new tax year.",
+    q: {
+      en: "Are donations to BICF tax deductible?",
+      fr: "Les dons à la BICF sont-ils déductibles d'impôt?",
+    },
+    a: {
+      en: "Yes. BICF is a registered Canadian non profit, and donations made through our official channels are eligible for a charitable tax receipt. Receipts are issued by email at the start of each new tax year.",
+      fr: "Oui. La BICF est un organisme canadien à but non lucratif enregistré, et les dons effectués par nos canaux officiels donnent droit à un reçu fiscal pour don de bienfaisance. Les reçus sont envoyés par courriel au début de chaque nouvelle année fiscale.",
+    },
   },
 ];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function validateField(field: Field, value: string): string | undefined {
+function validateField(field: Field, value: string): Bi | undefined {
   const v = value.trim();
   switch (field) {
     case "name":
-      if (!v) return "Please enter your name";
-      if (v.length < 2) return "Name is too short";
+      if (!v) return { en: "Please enter your name", fr: "Veuillez entrer votre nom" };
+      if (v.length < 2) return { en: "Name is too short", fr: "Le nom est trop court" };
       return;
     case "email":
-      if (!v) return "Please enter your email";
-      if (!EMAIL_RE.test(v)) return "Please enter a valid email";
+      if (!v) return { en: "Please enter your email", fr: "Veuillez entrer votre courriel" };
+      if (!EMAIL_RE.test(v))
+        return { en: "Please enter a valid email", fr: "Veuillez entrer un courriel valide" };
       return;
     case "phone": {
-      if (!v) return "Please enter your phone";
+      if (!v) return { en: "Please enter your phone", fr: "Veuillez entrer votre téléphone" };
       const digits = v.replace(/\D/g, "");
-      if (digits.length < 7) return "Please enter a valid phone number";
+      if (digits.length < 7)
+        return {
+          en: "Please enter a valid phone number",
+          fr: "Veuillez entrer un numéro de téléphone valide",
+        };
       return;
     }
     case "subject":
-      if (!v) return "Please enter a subject";
-      if (v.length < 2) return "Subject is too short";
+      if (!v) return { en: "Please enter a subject", fr: "Veuillez entrer un sujet" };
+      if (v.length < 2)
+        return { en: "Subject is too short", fr: "Le sujet est trop court" };
       return;
     case "message":
-      if (!v) return "Please leave a message";
-      if (v.length < 10) return "Message must be at least 10 characters";
+      if (!v) return { en: "Please leave a message", fr: "Veuillez laisser un message" };
+      if (v.length < 10)
+        return {
+          en: "Message must be at least 10 characters",
+          fr: "Le message doit contenir au moins 10 caractères",
+        };
       return;
     case "inquiry":
       return;
@@ -105,6 +160,7 @@ function validateAll(values: FormState): FormErrors {
 }
 
 export default function Contact() {
+  const { t, lang } = useLanguage();
   const [values, setValues] = useState<FormState>(initial);
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
@@ -113,9 +169,12 @@ export default function Contact() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
-    document.title = "Contact — Black Immigrants Community Foundation";
+    document.title = t({
+      en: "Contact | Black Immigrants Community Foundation",
+      fr: "Contact | Black Immigrants Community Foundation",
+    });
     window.scrollTo({ top: 0, behavior: "auto" });
-  }, []);
+  }, [t, lang]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
@@ -180,14 +239,29 @@ export default function Contact() {
             transition={{ duration: 0.8, ease }}
           >
             <h1 className="contact__heading">
-              Let&apos;s connect!
-              <br />
-              Reach out anytime!
+              {t({
+                en: (
+                  <>
+                    Let&apos;s connect!
+                    <br />
+                    Reach out anytime!
+                  </>
+                ),
+                fr: (
+                  <>
+                    Connectons-nous!
+                    <br />
+                    Écrivez-nous à tout moment!
+                  </>
+                ),
+              })}
             </h1>
 
             <div className="contact__channels">
               <div className="contact__channel">
-                <span className="contact__channel-label">Email</span>
+                <span className="contact__channel-label">
+                  {t({ en: "Email", fr: "Courriel" })}
+                </span>
                 <a
                   className="contact__channel-value"
                   href="mailto:info@blackimmigrantscommunityfoundation.com"
@@ -197,7 +271,9 @@ export default function Contact() {
               </div>
 
               <div className="contact__channel">
-                <span className="contact__channel-label">Phone</span>
+                <span className="contact__channel-label">
+                  {t({ en: "Phone", fr: "Téléphone" })}
+                </span>
                 <a className="contact__channel-value" href="tel:+19059313776">
                   (905) 931 3776
                 </a>
@@ -206,7 +282,7 @@ export default function Contact() {
 
             <div className="contact__location">
               <span className="contact__channel-label contact__channel-label--neutral">
-                Location
+                {t({ en: "Location", fr: "Emplacement" })}
               </span>
               <address className="contact__address">
                 190 Harwood Avenue South,
@@ -217,18 +293,9 @@ export default function Contact() {
 
             <div className="contact__socials">
               {[
-                {
-                  label: "Facebook",
-                  href: "https://facebook.com",
-                },
-                {
-                  label: "Linkedin",
-                  href: "https://linkedin.com",
-                },
-                {
-                  label: "Instagram",
-                  href: "https://instagram.com",
-                },
+                { label: "Facebook", href: "https://facebook.com" },
+                { label: "Linkedin", href: "https://linkedin.com" },
+                { label: "Instagram", href: "https://instagram.com" },
               ].map((s) => (
                 <a
                   key={s.label}
@@ -268,11 +335,11 @@ export default function Contact() {
               className="contact__form"
               onSubmit={handleSubmit}
               noValidate
-              aria-label="Contact form"
+              aria-label={t({ en: "Contact form", fr: "Formulaire de contact" })}
             >
-              <Field
+              <FormField
                 name="name"
-                label="Enter your name"
+                label={t({ en: "Enter your name", fr: "Entrez votre nom" })}
                 starred
                 value={values.name}
                 error={errors.name}
@@ -281,10 +348,10 @@ export default function Contact() {
               />
 
               <div className="contact__row">
-                <Field
+                <FormField
                   name="email"
                   type="email"
-                  label="Enter your email"
+                  label={t({ en: "Enter your email", fr: "Entrez votre courriel" })}
                   starred
                   value={values.email}
                   error={errors.email}
@@ -293,10 +360,10 @@ export default function Contact() {
                   autoComplete="email"
                   inputMode="email"
                 />
-                <Field
+                <FormField
                   name="phone"
                   type="tel"
-                  label="Enter your phone"
+                  label={t({ en: "Enter your phone", fr: "Entrez votre téléphone" })}
                   starred
                   value={values.phone}
                   error={errors.phone}
@@ -308,9 +375,9 @@ export default function Contact() {
               </div>
 
               <div className="contact__row">
-                <Field
+                <FormField
                   name="subject"
-                  label="Subject"
+                  label={t({ en: "Subject", fr: "Sujet" })}
                   starred
                   value={values.subject}
                   error={errors.subject}
@@ -324,7 +391,7 @@ export default function Contact() {
                   }`}
                 >
                   <label className="contact__label" htmlFor="inquiry">
-                    Inquiry type
+                    {t({ en: "Inquiry type", fr: "Type de demande" })}
                   </label>
                   <div className="contact__select-wrapper">
                     <select
@@ -335,10 +402,12 @@ export default function Contact() {
                       onChange={handleChange}
                       onBlur={handleBlur}
                     >
-                      <option value="">Select one</option>
+                      <option value="">
+                        {t({ en: "Select one", fr: "Sélectionnez" })}
+                      </option>
                       {inquiryOptions.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
+                        <option key={opt.value} value={opt.value}>
+                          {t(opt.label)}
                         </option>
                       ))}
                     </select>
@@ -357,9 +426,9 @@ export default function Contact() {
                 </div>
               </div>
 
-              <Field
+              <FormField
                 name="message"
-                label="Enter your message"
+                label={t({ en: "Enter your message", fr: "Entrez votre message" })}
                 starred
                 multiline
                 value={values.message}
@@ -370,12 +439,14 @@ export default function Contact() {
 
               <div className="contact__submit-row">
                 <button type="submit" className="footer__btn contact__submit">
-                  Submit now
+                  {t({ en: "Submit now", fr: "Envoyer" })}
                 </button>
                 {success && (
                   <p className="contact__success" role="status">
-                    Thank you! Your message has been received. We&apos;ll get
-                    back to you shortly.
+                    {t({
+                      en: "Thank you! Your message has been received. We'll get back to you shortly.",
+                      fr: "Merci! Votre message a bien été reçu. Nous vous répondrons sous peu.",
+                    })}
                   </p>
                 )}
               </div>
@@ -392,7 +463,7 @@ export default function Contact() {
             transition={{ duration: 0.85, ease }}
           >
             <h2 id="contact-faqs-title" className="contact__faqs-title">
-              FAQ
+              {t({ en: "FAQ", fr: "FAQ" })}
             </h2>
           </motion.header>
 
@@ -420,7 +491,7 @@ export default function Contact() {
                     id={`faq-button-${i}`}
                   >
                     <span className="contact__faq-num">{num}</span>
-                    <span className="contact__faq-q">{item.q}</span>
+                    <span className="contact__faq-q">{t(item.q)}</span>
                     <motion.span
                       className="contact__faq-icon"
                       animate={{ rotate: isOpen ? 45 : 0 }}
@@ -456,7 +527,7 @@ export default function Contact() {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.4, ease }}
                       >
-                        <p className="contact__faq-a">{item.a}</p>
+                        <p className="contact__faq-a">{t(item.a)}</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -475,7 +546,7 @@ type FieldProps = {
   label: string;
   type?: string;
   value: string;
-  error?: string;
+  error?: Bi;
   starred?: boolean;
   multiline?: boolean;
   autoComplete?: string;
@@ -488,7 +559,7 @@ type FieldProps = {
   ) => void;
 };
 
-function Field({
+function FormField({
   name,
   label,
   type = "text",
@@ -501,6 +572,7 @@ function Field({
   onChange,
   onBlur,
 }: FieldProps) {
+  const { t } = useLanguage();
   const id = `contact-${name}`;
   const labelText = starred ? `${label}*` : label;
 
@@ -542,7 +614,7 @@ function Field({
       )}
       {error && (
         <span id={`${id}-error`} className="contact__error" role="alert">
-          {error}
+          {t(error)}
         </span>
       )}
     </div>

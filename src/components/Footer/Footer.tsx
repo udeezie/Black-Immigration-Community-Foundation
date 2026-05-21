@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail } from 'lucide-react'
+import { useLanguage } from '../../context/LanguageContext'
 import './Footer.scss'
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const { lang, setLang, t } = useLanguage()
 
   return (
     <footer className="footer">
@@ -13,13 +15,20 @@ export default function Footer() {
 
           <div className="footer__left">
             <div className="footer__cta">
-              <span className="footer__label">Contact</span>
+              <span className="footer__label">{t({ en: 'Contact', fr: 'Contact' })}</span>
               <h2 className="footer__headline">
-                Let's Make<br />a Difference
+                {t({
+                  en: <>Let's Make<br />a Difference</>,
+                  fr: <>Faisons une<br />Différence</>,
+                })}
               </h2>
               <div className="footer__actions">
-                <Link to="/volunteer" className="footer__btn">Volunteer With Us</Link>
-                <Link to="/contact" className="footer__btn footer__btn--ghost">Get In Touch</Link>
+                <Link to="/volunteer" className="footer__btn">
+                  {t({ en: 'Volunteer With Us', fr: 'Devenez Bénévole' })}
+                </Link>
+                <Link to="/contact" className="footer__btn footer__btn--ghost">
+                  {t({ en: 'Get In Touch', fr: 'Nous Contacter' })}
+                </Link>
               </div>
             </div>
 
@@ -43,7 +52,7 @@ export default function Footer() {
             </address>
 
             <div className="footer__social-section">
-              <span className="footer__label">Follow Us</span>
+              <span className="footer__label">{t({ en: 'Follow Us', fr: 'Suivez-nous' })}</span>
               <ul className="footer__social-list">
                 <li className="footer__social-item">
                   <a href="#" aria-label="Instagram" data-social="instagram" target="_blank" rel="noopener noreferrer">
@@ -87,31 +96,59 @@ export default function Footer() {
                 </li>
               </ul>
             </div>
+
+            <div className="footer__lang">
+              <span className="footer__label">{t({ en: 'Language', fr: 'Langue' })}</span>
+              <div
+                className="footer__lang-switch"
+                role="group"
+                aria-label={t({ en: 'Select language', fr: 'Choisir la langue' })}
+              >
+                <button
+                  type="button"
+                  className={`footer__lang-btn ${lang === 'en' ? 'footer__lang-btn--active' : ''}`}
+                  onClick={() => setLang('en')}
+                  aria-pressed={lang === 'en'}
+                >
+                  <GlobeIcon />
+                  English
+                </button>
+                <span className="footer__lang-divider" aria-hidden="true" />
+                <button
+                  type="button"
+                  className={`footer__lang-btn ${lang === 'fr' ? 'footer__lang-btn--active' : ''}`}
+                  onClick={() => setLang('fr')}
+                  aria-pressed={lang === 'fr'}
+                >
+                  Français
+                </button>
+              </div>
+            </div>
           </div>
 
-          <nav className="footer__nav" aria-label="Footer navigation">
+          <nav className="footer__nav" aria-label={t({ en: 'Footer navigation', fr: 'Navigation du pied de page' })}>
             <div className="footer__nav-col">
-              <span className="footer__label">Main</span>
+              <span className="footer__label">{t({ en: 'Main', fr: 'Menu' })}</span>
               <ul>
-                <li><Link to="/">Home</Link></li>
-                <li><Link to="/about">About Us</Link></li>
-                <li><Link to="/services">Services</Link></li>
-                <li><Link to="/research">Research</Link></li>
-                <li><Link to="/careers">Careers</Link></li>
-                <li><Link to="/contact">Contact</Link></li>
+                <li><Link to="/">{t({ en: 'Home', fr: 'Accueil' })}</Link></li>
+                <li><Link to="/about">{t({ en: 'About Us', fr: 'À Propos' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Services', fr: 'Services' })}</Link></li>
+                <li><Link to="/research">{t({ en: 'Research', fr: 'Recherche' })}</Link></li>
+                <li><Link to="/careers">{t({ en: 'Careers', fr: 'Carrières' })}</Link></li>
+                <li><Link to="/contact">{t({ en: 'Contact', fr: 'Contact' })}</Link></li>
               </ul>
             </div>
 
             <div className="footer__nav-col">
-              <span className="footer__label">Programs</span>
+              <span className="footer__label">{t({ en: 'Programs', fr: 'Programmes' })}</span>
               <ul>
-                <li><Link to="/services">Legal Aid</Link></li>
-                <li><Link to="/services">Education</Link></li>
-                <li><Link to="/services">Employment</Link></li>
-                <li><Link to="/services">Mental Health</Link></li>
-                <li><Link to="/services">Youth and Family</Link></li>
-                <li><Link to="/services">Financial Aid</Link></li>
-                <li><Link to="/services">Crisis Support</Link></li>
+                <li><Link to="/services">{t({ en: 'Legal Aid', fr: 'Aide Juridique' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Education', fr: 'Éducation' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Employment', fr: 'Emploi' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Mental Health', fr: 'Santé Mentale' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Youth and Family', fr: 'Jeunesse et Famille' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Financial Aid', fr: 'Aide Financière' })}</Link></li>
+                <li><Link to="/services">{t({ en: 'Crisis Support', fr: 'Aide d\'Urgence' })}</Link></li>
               </ul>
             </div>
           </nav>
@@ -121,11 +158,16 @@ export default function Footer() {
 
       <div className="footer__bar">
         <div className="footer__bar-inner">
-          <p>&copy; {year}. Black Immigrants Community Foundation. All Rights Reserved.</p>
-          <nav className="footer__legal" aria-label="Legal links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Use</a>
-            <a href="#">Accessibility</a>
+          <p>
+            {t({
+              en: `© ${year}. Black Immigrants Community Foundation. All Rights Reserved.`,
+              fr: `© ${year}. Black Immigrants Community Foundation. Tous Droits Réservés.`,
+            })}
+          </p>
+          <nav className="footer__legal" aria-label={t({ en: 'Legal links', fr: 'Liens juridiques' })}>
+            <a href="#">{t({ en: 'Privacy Policy', fr: 'Confidentialité' })}</a>
+            <a href="#">{t({ en: 'Terms of Use', fr: 'Conditions d\'Utilisation' })}</a>
+            <a href="#">{t({ en: 'Accessibility', fr: 'Accessibilité' })}</a>
           </nav>
         </div>
       </div>
@@ -138,5 +180,22 @@ export default function Footer() {
       </div>
 
     </footer>
+  )
+}
+
+function GlobeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9.5" />
+      <path d="M2.5 12h19M12 2.5c2.6 2.6 4 6 4 9.5s-1.4 6.9-4 9.5c-2.6-2.6-4-6-4-9.5s1.4-6.9 4-9.5z" />
+    </svg>
   )
 }
