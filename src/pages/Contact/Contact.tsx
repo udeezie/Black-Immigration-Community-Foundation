@@ -166,6 +166,9 @@ export default function Contact() {
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<Bi | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
@@ -199,9 +202,10 @@ export default function Contact() {
     setErrors((prev) => ({ ...prev, [field]: err }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitAttempted(true);
+    setSubmitError(null);
     const allErrors = validateAll(values);
     setErrors(allErrors);
 
@@ -222,10 +226,31 @@ export default function Contact() {
       return;
     }
 
-    setSuccess(true);
-    setValues(initial);
-    setTouched({});
-    setSubmitAttempted(false);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...values, website: honeypot }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+
+      setSuccess(true);
+      setValues(initial);
+      setHoneypot("");
+      setTouched({});
+      setSubmitAttempted(false);
+    } catch {
+      setSubmitError({
+        en: "Sorry, we couldn't send your message. Please try again, or email us directly at info@blackimmigrantscommunityfoundation.com.",
+        fr: "Désolé, nous n'avons pas pu envoyer votre message. Veuillez réessayer ou nous écrire directement à info@blackimmigrantscommunityfoundation.com.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -437,16 +462,52 @@ export default function Contact() {
                 onBlur={handleBlur}
               />
 
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  left: "-9999px",
+                  width: 1,
+                  height: 1,
+                  overflow: "hidden",
+                }}
+              >
+                <label htmlFor="contact-website">
+                  Leave this field empty
+                </label>
+                <input
+                  id="contact-website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </div>
+
               <div className="contact__submit-row">
-                <button type="submit" className="footer__btn contact__submit">
-                  {t({ en: "Submit now", fr: "Envoyer" })}
+                <button
+                  type="submit"
+                  className="footer__btn contact__submit"
+                  disabled={submitting}
+                  aria-busy={submitting}
+                >
+                  {submitting
+                    ? t({ en: "Sending…", fr: "Envoi…" })
+                    : t({ en: "Submit now", fr: "Envoyer" })}
                 </button>
-                {success && (
+                {success && !submitError && (
                   <p className="contact__success" role="status">
                     {t({
                       en: "Thank you! Your message has been received. We'll get back to you shortly.",
                       fr: "Merci! Votre message a bien été reçu. Nous vous répondrons sous peu.",
                     })}
+                  </p>
+                )}
+                {submitError && (
+                  <p className="contact__error" role="alert">
+                    {t(submitError)}
                   </p>
                 )}
               </div>

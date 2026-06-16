@@ -82,35 +82,138 @@ body {
     }
   }
 
-  &__hero-photo {
+  /* On-theme geometric patterns that cross-fade in place of the hero photos */
+  &__hero-pattern {
     position: absolute;
     inset: 0;
     z-index: 1;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center 26%;
     opacity: 0;
-    transform: scale(1.05);
-    transition:
-      opacity 1s $ease-out,
-      transform 8s $ease-out;
-    will-change: opacity, transform;
+    background-color: #1c0900;
+    transition: opacity 0.8s ease;
+    will-change: opacity;
 
     &--active {
       opacity: 1;
-      transform: scale(1);
+    }
+
+    /* 1 — concentric target rings */
+    &--1 {
+      background-color: #1c0900;
+      background-image: repeating-radial-gradient(
+        circle at 50% 50%,
+        #ff8f43 0px,
+        #ff8f43 10px,
+        transparent 11px,
+        transparent 20px,
+        #c2400b 21px,
+        #c2400b 30px,
+        transparent 31px,
+        transparent 40px
+      );
+      background-size: 80px 80px;
+
+      @media (max-width: $bp-sm) {
+        background-size: 56px 56px;
+      }
+    }
+
+    /* 2 — grid with diamond overlay */
+    &--2 {
+      --g: 100px;
+      background-color: #ff8f43;
+      background-image:
+        linear-gradient(#1c0900 2px, transparent 2px),
+        linear-gradient(90deg, #1c0900 2px, transparent 2px);
+      background-size: var(--g) var(--g);
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-size: var(--g) var(--g);
+      }
+      &::before {
+        background-image:
+          linear-gradient(-45deg, #1c0900 20px, transparent 20px),
+          linear-gradient(-135deg, #1c0900 20px, transparent 20px),
+          linear-gradient(135deg, #1c0900 20px, transparent 20px),
+          linear-gradient(45deg, #1c0900 20px, transparent 20px);
+        background-position: 50px 50px;
+      }
+      &::after {
+        background-image:
+          linear-gradient(45deg, #1c0900 20px, transparent 20px),
+          linear-gradient(-45deg, #1c0900 20px, transparent 20px),
+          linear-gradient(135deg, #1c0900 20px, transparent 20px),
+          linear-gradient(-135deg, #1c0900 20px, transparent 20px);
+        background-position: 1px 1px;
+      }
+
+      @media (max-width: $bp-sm) {
+        --g: 64px;
+      }
+    }
+
+    /* 3 — conic fish-scale */
+    &--3 {
+      background:
+        conic-gradient(
+            from 0deg at 68.4% 85.35%,
+            #fff0 0 60deg,
+            #ff8f43 0 120deg,
+            #c2400b 0 202.5deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        conic-gradient(
+            from 0deg at 31.6% 85.35%,
+            #fff0 0 157.5deg,
+            #e0641f 0 240deg,
+            #ff8f43 0 300deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        conic-gradient(
+            from 0deg at 81.35% 35.5%,
+            #fff0 0 22.75deg,
+            #b8390a 0 157.25deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        conic-gradient(
+            from 0deg at 18.65% 35.5%,
+            #fff0 0 202.75deg,
+            #1c0900 0 337.25deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        conic-gradient(
+            from 0deg at 50% 50%,
+            #fff0 0 60deg,
+            #e0641f 0 157.5deg,
+            #1c0900 0 180.1deg,
+            #b8390a 0 202.5deg,
+            #c2400b 0 300deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        conic-gradient(
+            from 0deg at 50% 21.15%,
+            #fff0 0 22.5deg,
+            #c2400b 0 120deg,
+            #ff8f43 0 240deg,
+            #e0641f 0 337.5deg,
+            #fff0 0 360deg
+          )
+          50% / 20vmin 25vmin,
+        linear-gradient(90deg, #b8390a 0 50%, #1c0900 0 100%) 50% / 20vmin 25vmin;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    &__hero-photo {
+    &__hero-pattern {
       transition: opacity 0.2s linear;
-      transform: none;
-
-      &--active {
-        transform: none;
-      }
     }
   }
 

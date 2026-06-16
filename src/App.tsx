@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
@@ -15,15 +15,15 @@ const Contact = lazy(() => import("./pages/Contact/Contact"));
 
 function SmoothScroll() {
   const { pathname } = useLocation();
+  const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.1,
       smoothWheel: true,
-      syncTouch: true,
-      syncTouchLerp: 0.075,
+      syncTouch: false,
     });
+    lenisRef.current = lenis;
 
     let rafId = 0;
     const raf = (time: number) => {
@@ -32,18 +32,15 @@ function SmoothScroll() {
     };
     rafId = requestAnimationFrame(raf);
 
-    (window as any).lenis = lenis;
-
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
-      delete (window as any).lenis;
+      lenisRef.current = null;
     };
   }, []);
 
   useEffect(() => {
-    if ((window as any).lenis)
-      (window as any).lenis.scrollTo(0, { immediate: true });
+    lenisRef.current?.scrollTo(0, { immediate: true });
   }, [pathname]);
 
   return null;

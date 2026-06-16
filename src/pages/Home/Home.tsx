@@ -12,11 +12,9 @@ const heroSlides: {
   label: Bi;
   title: Record<Lang, string[]>;
   body: Bi;
-  image: string;
 }[] = [
   {
     label: { en: "Welcome to BICF", fr: "Bienvenue à la BICF" },
-    image: "/hh1.webp",
     title: {
       en: ["A home for those,", "building new homes."],
       fr: ["Un foyer pour ceux", "qui en bâtissent un."],
@@ -28,7 +26,6 @@ const heroSlides: {
   },
   {
     label: { en: "What We Do", fr: "Ce que nous faisons" },
-    image: "/hh2.webp",
     title: {
       en: ["Real support.", "Lasting impact."],
       fr: ["Un soutien réel.", "Un impact durable."],
@@ -40,7 +37,6 @@ const heroSlides: {
   },
   {
     label: { en: "Our Community", fr: "Notre communauté" },
-    image: "/hh3.webp",
     title: {
       en: ["A movement,", "just beginning."],
       fr: ["Un mouvement", "qui ne fait que commencer."],
@@ -502,20 +498,13 @@ export default function Home({
     <main className="home">
       <section className="home__hero" aria-labelledby="home-hero-title">
         <div className="home__hero-media" aria-hidden="true">
-          {heroSlides.map((slide, i) => (
-            <img
-              key={slide.image}
+          {heroSlides.map((_, i) => (
+            <div
+              key={i}
               className={
-                "home__hero-photo" +
-                (i === activeSlide ? " home__hero-photo--active" : "")
+                `home__hero-pattern home__hero-pattern--${i + 1}` +
+                (i === activeSlide ? " home__hero-pattern--active" : "")
               }
-              src={slide.image}
-              alt=""
-              loading={i === 0 ? "eager" : "lazy"}
-              decoding="async"
-              onError={(e) => {
-                e.currentTarget.style.visibility = "hidden";
-              }}
             />
           ))}
           <div className="home__hero-scrim" />
