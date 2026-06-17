@@ -415,3 +415,25 @@
   line-height: 1;
   user-select: none;
 }
+
+.footer__credit {
+  padding: 16px 0 24px;
+  text-align: center;
+  border-top: 1px solid var(--color-border);
+
+  span {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+}
+
+.footer__credit-link {
+  color: var(--color-text);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-accent);
+  }
+}

@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import nodemailer from "nodemailer";
 
-const RECIPIENT = "hello@aflostudios.com";
+const RECIPIENT =
+  process.env.CONTACT_TO || "info@blackimmigrantscommunityfoundation.com";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Body = {
@@ -37,14 +38,24 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  if (!user || !pass) {
-    console.error("SMTP_USER or SMTP_PASS env var is missing");
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const from = process.env.CONTACT_FROM || user;
+  if (!host || !user || !pass) {
+    console.error(
+      "SMTP configuration is incomplete (need SMTP_HOST, SMTP_USER, SMTP_PASS)",
+    );
     return res
       .status(500)
       .json({ error: "Email service is not configured" });
   }
+
+  // STARTTLS on 587 (secure=false), implicit TLS on 465 (secure=true).
+  const secure = process.env.SMTP_SECURE
+    ? process.env.SMTP_SECURE === "true"
+    : port === 465;
 
   const body = (req.body ?? {}) as Body;
 
@@ -71,10 +82,10 @@ export default async function handler(
       .json({ error: "Message must be at least 10 characters" });
 
   const transporter = nodemailer.createTransport({
-    host: "smtp.office365.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
+    host,
+    port,
+    secure,
+    requireTLS: !secure,
     auth: { user, pass },
   });
 
@@ -107,7 +118,7 @@ export default async function handler(
 
   try {
     await transporter.sendMail({
-      from: `"BICF Contact Form" <${user}>`,
+      from: `"BICF Contact Form" <${from}>`,
       to: RECIPIENT,
       replyTo: email,
       subject: `[BICF] ${subject}`,

@@ -364,6 +364,26 @@ export default function Home({
     const t2 = t2Ref.current;
     if (!section || !img || !t1 || !t2) return;
 
+    // Respect reduced motion: render the final state and skip the scroll work.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      img.style.opacity = "1";
+      img.style.transform = "none";
+      img.dataset.animating = "false";
+      t1.style.opacity = "1";
+      t1.style.setProperty("--y", "0px");
+      t2.style.opacity = "1";
+      t2.style.setProperty("--y", "0px");
+      return;
+    }
+
+    // iOS shows/hides its toolbar during scroll, which changes
+    // window.innerHeight every frame. Reading it live made the pinned image
+    // vibrate, so we cache the viewport and only refresh on a real width
+    // change (orientation), ignoring the toolbar's height-only churn.
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    let vw = window.innerWidth;
+    let vh = window.innerHeight;
+
     let cachedNat: { pageCX: number; pageCY: number } | null = null;
     let scheduled = false;
 
@@ -387,9 +407,6 @@ export default function Home({
     };
 
     const applyFrame = (p: number, rect: DOMRect) => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
       if (!cachedNat) measureNatural();
       const naturalCX = cachedNat!.pageCX - window.scrollX;
       const naturalCY = cachedNat!.pageCY - window.scrollY;
@@ -437,7 +454,7 @@ export default function Home({
       scheduled = true;
       requestAnimationFrame(() => {
         const rect = section.getBoundingClientRect();
-        const total = section.offsetHeight - window.innerHeight;
+        const total = section.offsetHeight - vh;
         const scrolled = clamp(-rect.top, 0, total);
         const p = total > 0 ? scrolled / total : 0;
         applyFrame(p, rect);
@@ -445,8 +462,17 @@ export default function Home({
       });
     };
 
-    const onResize = () => {
+    // Refresh viewport + measurements only on a real resize. On touch devices
+    // a height-only change is the iOS toolbar — ignore it to avoid jitter.
+    const syncViewport = () => {
+      if (coarse && window.innerWidth === vw) return;
+      vw = window.innerWidth;
+      vh = window.innerHeight;
       remeasure();
+    };
+
+    const onResize = () => {
+      syncViewport();
       onScroll();
     };
 
@@ -454,7 +480,7 @@ export default function Home({
     onScroll();
 
     const ro = new ResizeObserver(() => {
-      remeasure();
+      syncViewport();
       onScroll();
     });
     ro.observe(section);
@@ -481,15 +507,20 @@ export default function Home({
       }
     }
 
+    const onLoad = () => {
+      remeasure();
+      onScroll();
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
-    window.addEventListener("load", onResize);
+    window.addEventListener("load", onLoad);
 
     return () => {
       ro.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("load", onResize);
+      window.removeEventListener("load", onLoad);
       if (innerImg) innerImg.removeEventListener("load", onImgLoad);
     };
   }, []);

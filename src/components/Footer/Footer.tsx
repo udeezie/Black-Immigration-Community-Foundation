@@ -179,6 +179,20 @@ export default function Footer() {
         </div>
       </div>
 
+      <div className="footer__credit">
+        <span>
+          {t({ en: 'Website by', fr: 'Site web par' })}{' '}
+          <a
+            href="https://aflostudios.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer__credit-link"
+          >
+            AFLO Studios
+          </a>
+        </span>
+      </div>
+
     </footer>
   )
 }
