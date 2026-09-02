@@ -1,47 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+/* Programs page.
+   
+      Thirteen programs presented as a filterable catalogue rather than one long
+      list: the chips narrow the grid to a single area of focus, and each card
+      keeps its long detail folded away until asked for. */
+
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage, type Lang } from "../../context/LanguageContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./Services.scss";
 
 type Bi = Record<Lang, string>;
 
-const EASE = [0.25, 0.46, 0.45, 0.94] as const;
-
-const heroSlides: { label: Bi; title: Record<Lang, string[]>; body: Bi }[] = [
-  {
-    label: { en: "Our Services", fr: "Nos services" },
-    title: {
-      en: ["Comprehensive support", "for Black immigrants."],
-      fr: ["Un soutien complet", "pour les immigrants noirs."],
-    },
-    body: {
-      en: "Programs that help families overcome barriers, build stability, and thrive. Culturally relevant, no cost, and open to anyone navigating a barrier.",
-      fr: "Des programmes qui aident les familles à surmonter les obstacles, à bâtir leur stabilité et à s'épanouir. Adaptés à la culture, gratuits et ouverts à toute personne confrontée à un obstacle.",
-    },
-  },
-  {
-    label: { en: "What We Offer", fr: "Ce que nous offrons" },
-    title: {
-      en: ["Every door,", "covered."],
-      fr: ["Chaque porte,", "ouverte."],
-    },
-    body: {
-      en: "Legal, education, employment, wellness, family, community. Coordinated under one roof so support never falls between the cracks.",
-      fr: "Droit, éducation, emploi, mieux-être, famille, communauté. Coordonnés sous un même toit pour que personne ne passe entre les mailles du filet.",
-    },
-  },
-  {
-    label: { en: "Our Commitment", fr: "Notre engagement" },
-    title: {
-      en: ["No cost.", "No barriers."],
-      fr: ["Sans frais.", "Sans obstacles."],
-    },
-    body: {
-      en: "Every program is delivered at no cost and built around the cultural realities of the people we serve.",
-      fr: "Chaque programme est offert sans frais et conçu autour des réalités culturelles des personnes que nous servons.",
-    },
-  },
-];
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 type Solution = {
   num: string;
@@ -216,10 +188,7 @@ const solutions: Solution[] = [
   {
     num: "09",
     group: "community",
-    title: {
-      en: "Mental Health and Wellness",
-      fr: "Santé mentale et mieux-être",
-    },
+    title: { en: "Mental Health and Wellness", fr: "Santé mentale et mieux-être" },
     body: {
       en: "BICF provides culturally sensitive counseling, wellness workshops, and trauma informed care, helping reduce stigma and promote healing.",
       fr: "La BICF offre du counseling sensible à la culture, des ateliers de mieux-être et des soins tenant compte des traumatismes, contribuant à réduire la stigmatisation et à favoriser la guérison.",
@@ -237,10 +206,7 @@ const solutions: Solution[] = [
   {
     num: "10",
     group: "community",
-    title: {
-      en: "Youth and Family Programs",
-      fr: "Programmes jeunesse et famille",
-    },
+    title: { en: "Youth and Family Programs", fr: "Programmes jeunesse et famille" },
     body: {
       en: "We strengthen families through after school activities, mentorship, parenting classes, and youth leadership programs empowering the next generation to grow confidently and purposefully.",
       fr: "Nous renforçons les familles par des activités parascolaires, du mentorat, des cours pour parents et des programmes de leadership jeunesse, permettant à la prochaine génération de grandir avec confiance et détermination.",
@@ -300,10 +266,7 @@ const solutions: Solution[] = [
   {
     num: "13",
     group: "community",
-    title: {
-      en: "Networking and Collaboration",
-      fr: "Réseautage et collaboration",
-    },
+    title: { en: "Networking and Collaboration", fr: "Réseautage et collaboration" },
     body: {
       en: "Through partnerships, coalitions, and networking events, BICF connects individuals and organizations committed to equity and inclusion, strengthening collective impact.",
       fr: "Par des partenariats, des coalitions et des événements de réseautage, la BICF met en relation des personnes et des organisations engagées envers l'équité et l'inclusion, renforçant l'impact collectif.",
@@ -320,14 +283,13 @@ const solutions: Solution[] = [
   },
 ];
 
-type GroupMeta = {
+const groupMeta: {
   id: "first" | "work" | "community";
   label: Bi;
   title: Bi;
   body: Bi;
-};
-
-const groupMeta: GroupMeta[] = [
+  image: string;
+}[] = [
   {
     id: "first",
     label: { en: "First Steps", fr: "Premiers pas" },
@@ -336,6 +298,7 @@ const groupMeta: GroupMeta[] = [
       en: "The programs that help families land safely, build stability, and feel at home from day one.",
       fr: "Les programmes qui aident les familles à arriver en sécurité, à bâtir leur stabilité et à se sentir chez elles dès le premier jour.",
     },
+    image: "/h5.webp",
   },
   {
     id: "work",
@@ -345,6 +308,7 @@ const groupMeta: GroupMeta[] = [
       en: "Skills, training, and economic supports that turn ambition into stable income and lifelong opportunity.",
       fr: "Compétences, formation et soutiens économiques qui transforment l'ambition en revenu stable et en possibilités pour la vie.",
     },
+    image: "/h7.webp",
   },
   {
     id: "community",
@@ -354,6 +318,7 @@ const groupMeta: GroupMeta[] = [
       en: "Health, family, advocacy, and connection. The programs that nurture whole people and whole communities.",
       fr: "Santé, famille, défense des droits et liens. Les programmes qui nourrissent des personnes entières et des communautés entières.",
     },
+    image: "/h9.webp",
   },
 ];
 
@@ -395,513 +360,308 @@ const audiences: Bi[] = [
   { en: "Anyone navigating a barrier", fr: "Toute personne face à un obstacle" },
 ];
 
-type ServicesProps = {
-  pageTitle?: string;
-  autoplayDelay?: number;
-};
+type FilterId = "all" | Solution["group"];
+
+/* "All" plus one entry per group, so the chip row stays in step with
+   groupMeta without a second list to maintain. */
+const filters: { id: FilterId; label: Bi }[] = [
+  { id: "all", label: { en: "All programs", fr: "Tous les programmes" } },
+  ...groupMeta.map((g) => ({ id: g.id as FilterId, label: g.label })),
+];
 
 export default function Services({
-  pageTitle = "Services | Black Immigrants Community Foundation",
-  autoplayDelay = 8000,
-}: ServicesProps) {
+  pageTitle = "Programs | Black Immigrants Community Foundation",
+}: {
+  pageTitle?: string;
+}) {
   const { t, lang } = useLanguage();
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const toggleExpanded = (n: string) =>
-    setExpanded((cur) => (cur === n ? null : n));
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const [open, setOpen] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterId>("all");
 
   useEffect(() => {
     document.title =
       lang === "fr"
-        ? "Services | Black Immigrants Community Foundation"
+        ? "Programmes | Black Immigrants Community Foundation"
         : pageTitle;
   }, [pageTitle, lang]);
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setActiveSlide((i) => (i + 1) % heroSlides.length);
-    }, autoplayDelay);
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [activeSlide, autoplayDelay]);
+  const visible =
+    filter === "all" ? solutions : solutions.filter((s) => s.group === filter);
+  const activeGroup = groupMeta.find((g) => g.id === filter) ?? null;
 
-  const goTo = (i: number) =>
-    setActiveSlide(
-      ((i % heroSlides.length) + heroSlides.length) % heroSlides.length,
-    );
-
-  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      const next =
-        e.key === "ArrowRight"
-          ? (activeSlide + 1) % heroSlides.length
-          : (activeSlide - 1 + heroSlides.length) % heroSlides.length;
-      setActiveSlide(next);
-      tabsRef.current[next]?.focus();
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setActiveSlide(0);
-      tabsRef.current[0]?.focus();
-    } else if (e.key === "End") {
-      e.preventDefault();
-      const last = heroSlides.length - 1;
-      setActiveSlide(last);
-      tabsRef.current[last]?.focus();
-    }
+  const toggle = (n: string) => setOpen((cur) => (cur === n ? null : n));
+  const pick = (id: FilterId) => {
+    setFilter(id);
+    setOpen(null);
   };
 
+  const countFor = (id: FilterId) =>
+    id === "all"
+      ? solutions.length
+      : solutions.filter((s) => s.group === id).length;
+
   return (
-    <main className="services">
-      <section
-        className="services__hero"
-        aria-labelledby="services-hero-title"
-      >
-        <div className="services__hero-media" aria-hidden="true">
-          {heroSlides.map((_, i) => (
-            <div
-              key={i}
-              className={`services__hero-pattern services__hero-pattern--p${i}${
-                i === activeSlide ? " services__hero-pattern--active" : ""
-              }`}
-            />
-          ))}
-          <div className="services__hero-veil" />
+    <main className="services" id="main">
+      {/* ============================================ HERO */}
+      <section className="page-hero surface surface--dark" aria-labelledby="svc-title">
+        <div className="page-hero__glow" aria-hidden="true" />
+        <div className="container page-hero__inner">
+          <Reveal as="span" className="kicker" y={12}>
+            {t({ en: "Our Services", fr: "Nos services" })}
+          </Reveal>
+          <Reveal
+            as="h1"
+            id="svc-title"
+            className="h-display page-hero__title"
+            delay={0.05}
+          >
+            {t({
+              en: "Comprehensive support for Black immigrants to ",
+              fr: "Un soutien complet pour aider les immigrants noirs à ",
+            })}
+            <span className="accent-word">
+              {t({
+                en: "overcome barriers and thrive",
+                fr: "surmonter les obstacles et s'épanouir",
+              })}
+            </span>
+          </Reveal>
+          <Reveal as="p" className="lead page-hero__lead" delay={0.1}>
+            {t({
+              en: "At BICF, we provide comprehensive, culturally relevant programs that empower Black immigrants to overcome barriers, build stability, and thrive.",
+              fr: "À la BICF, nous offrons des programmes complets et adaptés à la culture qui permettent aux immigrants noirs de surmonter les obstacles, de bâtir leur stabilité et de s'épanouir.",
+            })}
+          </Reveal>
+          <Reveal as="div" className="page-hero__actions" delay={0.16}>
+            <Link to="/contact" className="btn btn--primary">
+              {t({ en: "Request Support", fr: "Demander du soutien" })}
+            </Link>
+          </Reveal>
         </div>
+      </section>
 
-        <div className="services__hero-panel">
-          <div className="services__hero-panel-inner">
-            <div className="services__hero-stage">
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div
-                  key={activeSlide}
-                  id={`services-hero-panel-${activeSlide}`}
-                  role="tabpanel"
-                  aria-labelledby={`services-hero-tab-${activeSlide}`}
-                  className="services__hero-slide"
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.55, ease: EASE }}
-                >
-                  <span className="services__hero-label">
-                    {t(heroSlides[activeSlide].label)}
-                  </span>
-                  <h1
-                    id="services-hero-title"
-                    className="services__hero-title"
-                  >
-                    {t(heroSlides[activeSlide].title).map((line, i) => (
-                      <span key={i} className="services__hero-line">
-                        {line}
-                      </span>
-                    ))}
-                  </h1>
-                  <p className="services__hero-body">
-                    {t(heroSlides[activeSlide].body)}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className="services__hero-controls">
-              <button
-                type="button"
-                className="services__hero-nav"
-                onClick={() => goTo(activeSlide - 1)}
-                aria-label={t({
-                  en: "Previous slide",
-                  fr: "Diapositive précédente",
+      {/* ============================================ WHO WE SERVE */}
+      <section className="who surface surface--light sheet" aria-labelledby="who-title">
+        <div className="container">
+          <div className="who__grid">
+            <div className="who__copy">
+              <Reveal as="span" className="kicker">
+                {t({ en: "Supporting Our Community", fr: "Soutenir notre communauté" })}
+              </Reveal>
+              <Reveal as="h2" id="who-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Our work spans education, advocacy, social support, and community development.",
+                  fr: "Notre travail couvre l'éducation, la défense des droits, le soutien social et le développement communautaire.",
                 })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M15 6L9 12L15 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              <div
-                className="services__hero-bars"
-                role="tablist"
-                aria-label={t({ en: "Hero slides", fr: "Diapositives" })}
-                onKeyDown={onTabsKeyDown}
-              >
-                {heroSlides.map((_, i) => (
-                  <button
-                    key={i}
-                    ref={(el) => {
-                      tabsRef.current[i] = el;
-                    }}
-                    type="button"
-                    role="tab"
-                    id={`services-hero-tab-${i}`}
-                    aria-controls={`services-hero-panel-${i}`}
-                    aria-selected={i === activeSlide}
-                    tabIndex={i === activeSlide ? 0 : -1}
-                    aria-label={t({
-                      en: `Go to slide ${i + 1}`,
-                      fr: `Aller à la diapositive ${i + 1}`,
-                    })}
-                    className={`services__hero-bar ${i === activeSlide ? "services__hero-bar--active" : ""}`}
-                    onClick={() => setActiveSlide(i)}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                className="services__hero-nav"
-                onClick={() => goTo(activeSlide + 1)}
-                aria-label={t({ en: "Next slide", fr: "Diapositive suivante" })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M9 6L15 12L9 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+              </Reveal>
+              <Reveal as="p" className="body" delay={0.1}>
+                {t({
+                  en: "Ensuring every individual and family receives the help they need to succeed.",
+                  fr: "Afin que chaque personne et chaque famille reçoive l'aide dont elle a besoin pour réussir.",
+                })}
+              </Reveal>
             </div>
 
-            <div className="services__hero-meta">
-              <span>{t({ en: "13 Programs", fr: "13 programmes" })}</span>
-              <span aria-hidden="true">·</span>
-              <span>{t({ en: "No cost", fr: "Sans frais" })}</span>
-              <span aria-hidden="true">·</span>
-              <span>
-                {t({ en: "Culturally relevant", fr: "Adapté à la culture" })}
-              </span>
-            </div>
+            <Reveal as="ul" className="who__tags" delay={0.14}>
+              {audiences.map((a) => (
+                <li key={a.en}>{t(a)}</li>
+              ))}
+            </Reveal>
           </div>
         </div>
       </section>
 
+      {/* ============================================ CATALOG */}
       <section
-        className="services__solutions"
-        id="solutions"
-        aria-labelledby="services-solutions-title"
+        className="catalog surface surface--tint"
+        id="programs"
+        aria-labelledby="catalog-title"
       >
-        <div className="services__container">
-          <header className="services__solutions-head">
-            <motion.span
-              className="services__kicker"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: EASE }}
-            >
-              {t({ en: "Our Services", fr: "Nos services" })}
-            </motion.span>
-            <motion.h2
-              id="services-solutions-title"
-              className="services__solutions-title"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: EASE, delay: 0.08 }}
-            >
-              {lang === "fr" ? (
-                <>
-                  <span>Nos</span>
-                  <span>solutions</span>
-                  <span>complètes.</span>
-                </>
-              ) : (
-                <>
-                  <span>Our</span>
-                  <span>comprehensive</span>
-                  <span>solutions.</span>
-                </>
-              )}
-            </motion.h2>
-            <motion.p
-              className="services__solutions-lede"
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.16 }}
-            >
-              {t({
-                en: "At BICF, we provide comprehensive, culturally relevant programs that empower Black immigrants to overcome barriers, build stability, and thrive.",
-                fr: "À la BICF, nous offrons des programmes complets et adaptés à la culture qui outillent les immigrants noirs à surmonter les obstacles, à bâtir leur stabilité et à s'épanouir.",
-              })}
-            </motion.p>
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "Our Programs", fr: "Nos programmes" })}
+              </Reveal>
+              <Reveal as="h2" id="catalog-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Thirteen programs, three areas of focus.",
+                  fr: "Treize programmes, trois domaines d'intervention.",
+                })}
+              </Reveal>
+            </div>
+            <Reveal as="div" className="section-head__aside" delay={0.1}>
+              <p className="body">
+                {t({
+                  en: "Choose an area to narrow the list, or browse everything. Open any program for the full detail.",
+                  fr: "Choisissez un domaine pour filtrer la liste, ou parcourez l'ensemble. Ouvrez un programme pour tous les détails.",
+                })}
+              </p>
+            </Reveal>
           </header>
+
+          <div
+            className="catalog__filters"
+            role="tablist"
+            aria-label={t({
+              en: "Filter programs by area",
+              fr: "Filtrer les programmes par domaine",
+            })}
+          >
+            {filters.map((f) => {
+              const on = filter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={on}
+                  aria-controls="catalog-grid"
+                  className={`chip ${on ? "chip--on" : ""}`}
+                  onClick={() => pick(f.id)}
+                >
+                  <span>{t(f.label)}</span>
+                  <span className="chip__count">
+                    {String(countFor(f.id)).padStart(2, "0")}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Keys are namespaced because this banner and the grid below are
+              siblings that would otherwise both be keyed "first". */}
+          {activeGroup && (
+            <div className="catalog__banner" key={`banner-${activeGroup.id}`}>
+              <figure className="catalog__banner-media">
+                <img
+                  src={activeGroup.image}
+                  alt=""
+                  width={800}
+                  height={600}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              <div className="catalog__banner-copy">
+                <h3 className="h3">{t(activeGroup.title)}</h3>
+                <p className="body">{t(activeGroup.body)}</p>
+              </div>
+            </div>
+          )}
+
+          <ul className="catalog__grid" id="catalog-grid" key={`grid-${filter}`}>
+            {visible.map((sn, i) => {
+              const isOpen = open === sn.num;
+              return (
+                <li
+                  className={`pcard ${isOpen ? "pcard--open" : ""}`}
+                  key={sn.num}
+                  style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+                >
+                  <h3 className="pcard__title">{t(sn.title)}</h3>
+                  <p className="pcard__body">{t(sn.body)}</p>
+
+                  <ul className="pcard__tags">
+                    {sn.tags.map((tag) => (
+                      <li key={tag.en}>{t(tag)}</li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    className="pcard__more"
+                    onClick={() => toggle(sn.num)}
+                    aria-expanded={isOpen}
+                    aria-controls={`p-${sn.num}`}
+                  >
+                    <span>
+                      {isOpen
+                        ? t({ en: "Show less", fr: "Voir moins" })
+                        : t({ en: "Full detail", fr: "Tous les détails" })}
+                    </span>
+                    <span className="pcard__plus" aria-hidden="true">
+                      <svg width="13" height="13" viewBox="0 0 15 15" fill="none">
+                        <path
+                          d="M7.5 1.5V13.5M1.5 7.5H13.5"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="d"
+                        id={`p-${sn.num}`}
+                        className="pcard__detail"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.36, ease: EASE }}
+                      >
+                        <p className="pcard__detail-text">{t(sn.detail)}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
 
-      {groupMeta.map((group, gi) => {
-        const items = solutions.filter((s) => s.group === group.id);
-        return (
-          <section
-            key={group.id}
-            className={`services__group services__group--${group.id}`}
-            aria-labelledby={`services-group-${group.id}-title`}
-          >
-            <div className="services__container">
-              <header className="services__group-head">
-                <motion.span
-                  className="services__group-step"
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-12%" }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                >
-                  {String(gi + 1).padStart(2, "0")} / {String(groupMeta.length).padStart(2, "0")}
-                </motion.span>
-                <motion.span
-                  className="services__kicker"
-                  initial={{ opacity: 0, y: 14 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-12%" }}
-                  transition={{ duration: 0.55, ease: EASE, delay: 0.06 }}
-                >
-                  {t(group.label)}
-                </motion.span>
-                <motion.h2
-                  id={`services-group-${group.id}-title`}
-                  className="services__group-title"
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-12%" }}
-                  transition={{ duration: 0.85, ease: EASE, delay: 0.1 }}
-                >
-                  {t(group.title)}
-                </motion.h2>
-                <motion.p
-                  className="services__group-body"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-12%" }}
-                  transition={{ duration: 0.7, ease: EASE, delay: 0.16 }}
-                >
-                  {t(group.body)}
-                </motion.p>
-              </header>
-
-              <ol className="services__rows">
-                {items.map((s, i) => {
-                  const isOpen = expanded === s.num;
-                  return (
-                    <motion.li
-                      key={s.num}
-                      className={`services__row ${isOpen ? "services__row--open" : ""}`}
-                      initial={{ opacity: 0, y: 18 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-6%" }}
-                      transition={{
-                        duration: 0.55,
-                        ease: EASE,
-                        delay: Math.min(i * 0.04, 0.18),
-                      }}
-                    >
-                      <span className="services__row-num" aria-hidden="true">
-                        {s.num}
-                      </span>
-                      <div className="services__row-main">
-                        <h3 className="services__row-title">{t(s.title)}</h3>
-                        <p className="services__row-body">{t(s.body)}</p>
-                      </div>
-                      <ul
-                        className="services__row-tags"
-                        aria-label={t({
-                          en: "Focus areas",
-                          fr: "Domaines d'intervention",
-                        })}
-                      >
-                        {s.tags.map((tag) => (
-                          <li key={tag.en} className="services__row-tag">
-                            {t(tag)}
-                          </li>
-                        ))}
-                      </ul>
-                      <button
-                        type="button"
-                        className="services__row-toggle"
-                        onClick={() => toggleExpanded(s.num)}
-                        aria-expanded={isOpen}
-                        aria-controls={`services-detail-${s.num}`}
-                        aria-label={
-                          isOpen
-                            ? t({
-                                en: `Collapse ${t(s.title)}`,
-                                fr: `Réduire ${t(s.title)}`,
-                              })
-                            : t({
-                                en: `Expand ${t(s.title)}`,
-                                fr: `Développer ${t(s.title)}`,
-                              })
-                        }
-                      >
-                        <motion.span
-                          className="services__row-toggle-icon"
-                          animate={{ rotate: isOpen ? 45 : 0 }}
-                          transition={{ duration: 0.35, ease: EASE }}
-                          aria-hidden="true"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 14 14"
-                            fill="none"
-                          >
-                            <path
-                              d="M7 1V13M1 7H13"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </motion.span>
-                      </button>
-                      <AnimatePresence initial={false}>
-                        {isOpen && (
-                          <motion.div
-                            id={`services-detail-${s.num}`}
-                            className="services__row-detail"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.42, ease: EASE }}
-                          >
-                            <p className="services__row-detail-text">
-                              {t(s.detail)}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.li>
-                  );
+      {/* ============================================ HOW IT WORKS */}
+      <section
+        className="steps surface surface--dark sheet"
+        aria-labelledby="steps-title"
+      >
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "How it works", fr: "Comment ça marche" })}
+              </Reveal>
+              <Reveal as="h2" id="steps-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Get the Support You Need.",
+                  fr: "Obtenez le soutien dont vous avez besoin.",
                 })}
-              </ol>
+              </Reveal>
             </div>
-          </section>
-        );
-      })}
-
-      <section className="services__how" aria-labelledby="services-how-title">
-        <div className="services__container">
-          <header className="services__section-head services__section-head--center">
-            <motion.span
-              className="services__kicker"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: EASE }}
-            >
-              {t({ en: "How It Works", fr: "Comment ça fonctionne" })}
-            </motion.span>
-            <motion.h2
-              id="services-how-title"
-              className="services__section-title"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "From reaching out to walking forward.",
-                fr: "De la prise de contact à l'avancée.",
-              })}
-            </motion.h2>
+            <Reveal as="div" className="section-head__aside" delay={0.1}>
+              <p className="body">
+                {t({
+                  en: "No cost. No proof of status required. Every conversation is confidential.",
+                  fr: "Sans frais. Aucune preuve de statut exigée. Chaque conversation est confidentielle.",
+                })}
+              </p>
+            </Reveal>
           </header>
 
-          <ol className="services__steps">
-            {steps.map((s, i) => (
-              <motion.li
-                key={s.num}
-                className="services__step"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.75, ease: EASE, delay: i * 0.1 }}
-              >
-                <span className="services__step-num">{s.num}</span>
-                <h3 className="services__step-title">{t(s.title)}</h3>
-                <p className="services__step-body">{t(s.body)}</p>
-              </motion.li>
+          <ol className="steps__track">
+            {steps.map((st, i) => (
+              <Reveal as="li" className="step" key={st.num} delay={i * 0.08}>
+                <span className="step__marker" aria-hidden="true">
+                  {st.num}
+                </span>
+                <h3 className="h3 step__title">{t(st.title)}</h3>
+                <p className="step__body">{t(st.body)}</p>
+              </Reveal>
             ))}
           </ol>
-        </div>
-      </section>
 
-      <section className="services__open" aria-labelledby="services-open-title">
-        <div className="services__open-aurora" aria-hidden="true" />
-        <div className="services__container">
-          <header className="services__open-head">
-            <motion.span
-              className="services__kicker"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: EASE }}
-            >
-              {t({ en: "Open To All", fr: "Ouvert à tous" })}
-            </motion.span>
-            <motion.h2
-              id="services-open-title"
-              className="services__open-title"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "For every story that needs support.",
-                fr: "Pour chaque histoire qui a besoin de soutien.",
-              })}
-            </motion.h2>
-            <motion.p
-              className="services__open-body"
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.16 }}
-            >
-              {t({
-                en: "Our programs are open to Black immigrants at any stage of the journey. Newcomers and longtime residents, families and individuals, documented or otherwise. If you're navigating a barrier, you're welcome here.",
-                fr: "Nos programmes sont ouverts aux immigrants noirs à toute étape de leur parcours. Nouveaux arrivants et résidents de longue date, familles et personnes seules, avec ou sans papiers. Si vous faites face à un obstacle, vous êtes le bienvenu ici.",
-              })}
-            </motion.p>
-          </header>
-
-          <motion.ul
-            className="services__open-tags"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.24 }}
-          >
-            {audiences.map((a) => (
-              <li key={a.en} className="services__open-tag">
-                {t(a)}
-              </li>
-            ))}
-          </motion.ul>
+          <Reveal as="div" className="steps__cta" delay={0.2}>
+            <Link to="/contact" className="btn btn--primary">
+              {t({ en: "Start the conversation", fr: "Entamer la conversation" })}
+            </Link>
+            <a href="tel:+19059313776" className="btn btn--outline">
+              {t({ en: "Call (905) 931 3776", fr: "Appeler (905) 931 3776" })}
+            </a>
+          </Reveal>
         </div>
       </section>
     </main>

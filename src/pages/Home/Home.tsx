@@ -1,125 +1,19 @@
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+/* Home page.
+   
+      Content lives in the arrays at the top of the file (services, testimonials,
+      sponsors...) so copy edits never touch layout. The page body is only
+      composition. */
+
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage, type Lang } from "../../context/LanguageContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./Home.scss";
 
 type Bi = Record<Lang, string>;
 
-const HERO_EASE = [0.25, 0.46, 0.45, 0.94] as const;
-
-const heroSlides: {
-  label: Bi;
-  title: Record<Lang, string[]>;
-  body: Bi;
-}[] = [
-  {
-    label: { en: "Welcome to BICF", fr: "Bienvenue à la BICF" },
-    title: {
-      en: ["A home for those,", "building new homes."],
-      fr: ["Un foyer pour ceux", "qui en bâtissent un."],
-    },
-    body: {
-      en: "We stand beside Black immigrants from the moment they arrive, with the advocacy, resources, and community that turn unfamiliar ground into firm footing.",
-      fr: "Nous accompagnons les immigrants noirs dès leur arrivée, avec la défense des droits, les ressources et la communauté qui transforment un terrain inconnu en assise solide.",
-    },
-  },
-  {
-    label: { en: "What We Do", fr: "Ce que nous faisons" },
-    title: {
-      en: ["Real support.", "Lasting impact."],
-      fr: ["Un soutien réel.", "Un impact durable."],
-    },
-    body: {
-      en: "Legal guidance, educational pathways, wellness, and employment support. Every service is built so Black immigrants don't just survive, they thrive.",
-      fr: "Accompagnement juridique, parcours éducatifs, mieux-être et soutien à l'emploi. Chaque service est conçu pour que les immigrants noirs ne se contentent pas de survivre, mais s'épanouissent.",
-    },
-  },
-  {
-    label: { en: "Our Community", fr: "Notre communauté" },
-    title: {
-      en: ["A movement,", "just beginning."],
-      fr: ["Un mouvement", "qui ne fait que commencer."],
-    },
-    body: {
-      en: "BICF is a young foundation built around one clear purpose, to walk with Black immigrants as they build new lives. Every story shared shapes what we become.",
-      fr: "La BICF est une jeune fondation animée par un but clair : accompagner les immigrants noirs alors qu'ils bâtissent une nouvelle vie. Chaque histoire partagée façonne ce que nous devenons.",
-    },
-  },
-];
-
-const INTRO_FACES = ["/h1.webp", "/h2.webp", "/h3.webp"];
-
-const testimonials: { quote: Bi; name: string; role: Bi }[] = [
-  {
-    quote: {
-      en: "The counseling and wellness programs at BICF helped me manage the stress of immigration. Their culturally sensitive approach gave me healing and strength.",
-      fr: "Les programmes de counseling et de mieux-être de la BICF m'ont aidée à gérer le stress de l'immigration. Leur approche sensible à la culture m'a apporté guérison et force.",
-    },
-    name: "Anim",
-    role: { en: "Community Member", fr: "Membre de la communauté" },
-  },
-  {
-    quote: {
-      en: "As a parent, I appreciate BICF's youth and family programs. They help my children grow confidently while staying proud of their heritage.",
-      fr: "En tant que parent, j'apprécie les programmes jeunesse et famille de la BICF. Ils aident mes enfants à grandir avec confiance tout en restant fiers de leur héritage.",
-    },
-    name: "Chinyera",
-    role: { en: "Parent", fr: "Parent" },
-  },
-  {
-    quote: {
-      en: "BICF's financial literacy workshops taught me how to manage my money wisely. I now feel confident budgeting, saving, and planning for the future.",
-      fr: "Les ateliers de littératie financière de la BICF m'ont appris à gérer mon argent judicieusement. Je me sens maintenant à l'aise pour budgéter, épargner et planifier l'avenir.",
-    },
-    name: "James",
-    role: { en: "Workshop Participant", fr: "Participant aux ateliers" },
-  },
-  {
-    quote: {
-      en: "When I arrived, I felt lost. The team walked me through the legal process step by step. I would not be where I am today without their guidance.",
-      fr: "À mon arrivée, je me sentais perdue. L'équipe m'a guidée pas à pas dans le processus juridique. Je ne serais pas là où je suis aujourd'hui sans leur accompagnement.",
-    },
-    name: "Adwoa",
-    role: { en: "New Resident", fr: "Nouvelle résidente" },
-  },
-];
-
-const sponsors: { name: Bi; short: Bi; src: string; href: string }[] = [
-  {
-    name: {
-      en: "Government of Canada, Supporting Black Canadian Communities Initiative",
-      fr: "Gouvernement du Canada, Initiative Appuyer les communautés noires du Canada",
-    },
-    short: { en: "Government of Canada", fr: "Gouvernement du Canada" },
-    src: "/canada.png",
-    href: "https://www.canada.ca/en/employment-social-development/programs/supporting-black-canadian-communities-initiative.html",
-  },
-  {
-    name: { en: "Black Business Initiative", fr: "Black Business Initiative" },
-    short: { en: "BBI", fr: "BBI" },
-    src: "/bbi.png",
-    href: "https://bbi.ca/",
-  },
-  {
-    name: {
-      en: "Ontario Trillium Foundation",
-      fr: "Fondation Trillium de l'Ontario",
-    },
-    short: {
-      en: "Ontario Trillium Foundation",
-      fr: "Fondation Trillium de l'Ontario",
-    },
-    src: "/otf.png",
-    href: "https://otf.ca/",
-  },
-  {
-    name: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
-    short: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
-    src: "/ontario.png",
-    href: "https://www.ontario.ca/",
-  },
-];
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const principles: { eyebrow: Bi; body: Bi }[] = [
   {
@@ -149,7 +43,7 @@ const services: { label: Bi; tag: Bi; body: Bi; image: string }[] = [
     image: "/h5.webp",
   },
   {
-    label: { en: "Education Support", fr: "Soutien à l'éducation" },
+    label: { en: "Educational Support", fr: "Soutien éducatif" },
     tag: { en: "Learning that lifts", fr: "Un savoir qui élève" },
     body: {
       en: "Scholarships, tutoring, and resources to help achieve academic and career goals.",
@@ -176,16 +70,127 @@ const services: { label: Bi; tag: Bi; body: Bi; image: string }[] = [
     image: "/h8.webp",
   },
   {
-    label: {
-      en: "Community & Advocacy",
-      fr: "Communauté et défense des droits",
-    },
+    label: { en: "Community & Advocacy", fr: "Communauté et défense des droits" },
     tag: { en: "Voices amplified", fr: "Des voix amplifiées" },
     body: {
       en: "Empowering Black immigrants through community, leadership, and advocacy.",
       fr: "Outiller les immigrants noirs par la communauté, le leadership et la défense des droits.",
     },
     image: "/h9.webp",
+  },
+];
+
+const testimonials: { quote: Bi; name: string }[] = [
+  {
+    quote: {
+      en: "BICF's educational programs made it easier for me to understand and navigate the Canadian education system. From school applications to scholarships, their guidance gave me hope and direction.",
+      fr: "Les programmes éducatifs de la BICF m'ont permis de mieux comprendre le système d'éducation canadien et de m'y orienter. Des demandes d'admission aux bourses, leur accompagnement m'a donné espoir et direction.",
+    },
+    name: "Amina",
+  },
+  {
+    quote: {
+      en: "After facing discrimination at work, BICF stood by me and helped me find my voice. Their advocacy gave me courage and reminded me that my rights matter.",
+      fr: "Après avoir subi de la discrimination au travail, la BICF m'a soutenu et m'a aidé à faire entendre ma voix. Leur défense m'a donné du courage et m'a rappelé que mes droits comptent.",
+    },
+    name: "Samuel",
+  },
+  {
+    quote: {
+      en: "Moving to a new country was lonely, but BICF's community programs helped me connect with others and find belonging. I finally feel accepted and supported.",
+      fr: "Arriver dans un nouveau pays était solitaire, mais les programmes communautaires de la BICF m'ont aidée à rencontrer d'autres personnes et à trouver ma place. Je me sens enfin acceptée et soutenue.",
+    },
+    name: "Nadiae",
+  },
+  {
+    quote: {
+      en: "The counseling and wellness programs at BICF helped me manage the stress of immigration. Their culturally sensitive approach gave me healing and strength.",
+      fr: "Les programmes de counseling et de mieux-être de la BICF m'ont aidée à gérer le stress de l'immigration. Leur approche sensible à la culture m'a apporté guérison et force.",
+    },
+    name: "Anim",
+  },
+  {
+    quote: {
+      en: "As a parent, I appreciate BICF's youth and family programs. They help my children grow confidently while staying proud of their heritage.",
+      fr: "En tant que parent, j'apprécie les programmes jeunesse et famille de la BICF. Ils aident mes enfants à grandir avec confiance tout en restant fiers de leur héritage.",
+    },
+    name: "Chinyera",
+  },
+  {
+    quote: {
+      en: "BICF's financial literacy workshops taught me how to manage my money wisely. I now feel confident budgeting, saving, and planning for the future.",
+      fr: "Les ateliers de littératie financière de la BICF m'ont appris à gérer mon argent judicieusement. Je me sens maintenant à l'aise pour budgéter, épargner et planifier l'avenir.",
+    },
+    name: "James",
+  },
+];
+
+const sponsors: {
+  name: Bi;
+  short: Bi;
+  src: string;
+  href: string;
+  /* `dark` flags a logo file drawn in white, which needs its own tile to
+     stay legible on the light funder strip. */
+  dark?: boolean;
+}[] = [
+  {
+    name: {
+      en: "Government of Canada, Supporting Black Canadian Communities Initiative",
+      fr: "Gouvernement du Canada, Initiative Appuyer les communautés noires du Canada",
+    },
+    short: { en: "Government of Canada", fr: "Gouvernement du Canada" },
+    src: "/canada.png",
+    href: "https://www.canada.ca/en/employment-social-development/programs/supporting-black-canadian-communities-initiative.html",
+  },
+  {
+    name: { en: "Black Business Initiative", fr: "Black Business Initiative" },
+    short: { en: "BBI", fr: "BBI" },
+    src: "/bbi.png",
+    href: "https://bbi.ca/",
+    dark: true,
+  },
+  {
+    name: {
+      en: "Ontario Trillium Foundation",
+      fr: "Fondation Trillium de l'Ontario",
+    },
+    short: {
+      en: "Ontario Trillium Foundation",
+      fr: "Fondation Trillium de l'Ontario",
+    },
+    src: "/otf.png",
+    href: "https://otf.ca/",
+  },
+  {
+    name: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
+    short: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
+    src: "/ontario.png",
+    href: "https://www.ontario.ca/",
+  },
+];
+
+const involvement: { title: Bi; body: Bi }[] = [
+  {
+    title: { en: "Volunteer", fr: "Bénévolat" },
+    body: {
+      en: "We welcome volunteers in legal intake, communications, event coordination, youth mentorship, and administrative roles.",
+      fr: "Nous accueillons des bénévoles pour l'accueil juridique, les communications, la coordination d'événements, le mentorat jeunesse et les tâches administratives.",
+    },
+  },
+  {
+    title: { en: "Partner With Us", fr: "Devenir partenaire" },
+    body: {
+      en: "BICF values partnerships with other organizations, community groups, and stakeholders who share our vision of a just and inclusive society.",
+      fr: "La BICF valorise les partenariats avec d'autres organisations, groupes communautaires et parties prenantes qui partagent notre vision d'une société juste et inclusive.",
+    },
+  },
+  {
+    title: { en: "Share Our Story", fr: "Partagez notre histoire" },
+    body: {
+      en: "Every share widens the circle of people who know that support exists, and helps more families find us.",
+      fr: "Chaque partage élargit le cercle de ceux qui savent que du soutien existe et aide plus de familles à nous trouver.",
+    },
   },
 ];
 
@@ -262,29 +267,13 @@ const homeFaqs: { q: Bi; a: Bi }[] = [
   },
 ];
 
-const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-const easeOutQ = (t: number) => 1 - Math.pow(1 - t, 4);
-
-type HomeProps = {
-  pageTitle?: string;
-  autoplayDelay?: number;
-};
-
 export default function Home({
-  pageTitle = "Home | Black Immigrants Community Foundation",
-  autoplayDelay = 8000,
-}: HomeProps) {
+  pageTitle = "Black Immigrants Community Foundation | BICF",
+}: {
+  pageTitle?: string;
+}) {
   const { t, lang } = useLanguage();
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [faceIndex, setFaceIndex] = useState(0);
-  const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const testimonialTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     document.title =
@@ -293,1019 +282,512 @@ export default function Home({
         : pageTitle;
   }, [pageTitle, lang]);
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setActiveSlide((i) => (i + 1) % heroSlides.length);
-    }, autoplayDelay);
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [activeSlide, autoplayDelay]);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setFaceIndex((i) => (i + 1) % INTRO_FACES.length);
-    }, 3000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (testimonialTimerRef.current) clearTimeout(testimonialTimerRef.current);
-    testimonialTimerRef.current = setTimeout(() => {
-      setTestimonialIndex((i) => (i + 1) % testimonials.length);
-    }, 7000);
-    return () => {
-      if (testimonialTimerRef.current)
-        clearTimeout(testimonialTimerRef.current);
-    };
-  }, [testimonialIndex]);
-
-  const goToTestimonial = (i: number) =>
-    setTestimonialIndex(
-      ((i % testimonials.length) + testimonials.length) % testimonials.length,
-    );
-
-  const goTo = (i: number) =>
-    setActiveSlide(
-      ((i % heroSlides.length) + heroSlides.length) % heroSlides.length,
-    );
-
-  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      const next =
-        e.key === "ArrowRight"
-          ? (activeSlide + 1) % heroSlides.length
-          : (activeSlide - 1 + heroSlides.length) % heroSlides.length;
-      setActiveSlide(next);
-      tabsRef.current[next]?.focus();
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setActiveSlide(0);
-      tabsRef.current[0]?.focus();
-    } else if (e.key === "End") {
-      e.preventDefault();
-      const last = heroSlides.length - 1;
-      setActiveSlide(last);
-      tabsRef.current[last]?.focus();
-    }
-  };
-
-  const storyRef = useRef<HTMLElement | null>(null);
-  const imgRef = useRef<HTMLDivElement | null>(null);
-  const t1Ref = useRef<HTMLDivElement | null>(null);
-  const t2Ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const section = storyRef.current;
-    const img = imgRef.current;
-    const t1 = t1Ref.current;
-    const t2 = t2Ref.current;
-    if (!section || !img || !t1 || !t2) return;
-
-    // Respect reduced motion: render the final state and skip the scroll work.
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      img.style.opacity = "1";
-      img.style.transform = "none";
-      img.dataset.animating = "false";
-      t1.style.opacity = "1";
-      t1.style.setProperty("--y", "0px");
-      t2.style.opacity = "1";
-      t2.style.setProperty("--y", "0px");
-      return;
-    }
-
-    // iOS shows/hides its toolbar during scroll, which changes
-    // window.innerHeight every frame. Reading it live made the pinned image
-    // vibrate, so we cache the viewport and only refresh on a real width
-    // change (orientation), ignoring the toolbar's height-only churn.
-    const coarse = window.matchMedia("(pointer: coarse)").matches;
-    let vw = window.innerWidth;
-    let vh = window.innerHeight;
-
-    let cachedNat: { pageCX: number; pageCY: number } | null = null;
-    let scheduled = false;
-
-    const measureNatural = () => {
-      const savedT = img.style.transform;
-      const savedO = img.style.opacity;
-      img.style.transform = "none";
-      img.style.opacity = "0";
-      const r = img.getBoundingClientRect();
-      cachedNat = {
-        pageCX: r.left + window.scrollX + r.width / 2,
-        pageCY: r.top + window.scrollY + r.height / 2,
-      };
-      img.style.transform = savedT;
-      img.style.opacity = savedO;
-    };
-
-    const remeasure = () => {
-      cachedNat = null;
-      measureNatural();
-    };
-
-    const applyFrame = (p: number, rect: DOMRect) => {
-      if (!cachedNat) measureNatural();
-      const naturalCX = cachedNat!.pageCX - window.scrollX;
-      const naturalCY = cachedNat!.pageCY - window.scrollY;
-      const fullOffX = vw / 2 - naturalCX;
-      const fullOffY = vh / 2 - naturalCY;
-
-      if (rect.top > vh * 0.5) {
-        img.style.opacity = "0";
-        img.style.transform = "translate3d(0,0,0)";
-        img.dataset.animating = "false";
-        t1.style.opacity = "0";
-        t2.style.opacity = "0";
-        return;
-      }
-      img.style.opacity = String(
-        rect.top > 0 ? clamp(1 - rect.top / (vh * 0.5), 0, 1) : 1,
-      );
-
-      const pImg = clamp((p - 0.82) / 0.18, 0, 1);
-      const eImg = easeOut(pImg);
-      const offX = fullOffX * (1 - eImg);
-      const offY = fullOffY * (1 - eImg);
-      const scale = 1 - eImg * 0.03;
-      img.dataset.animating = eImg < 0.999 ? "true" : "false";
-      img.style.transform = `translate3d(${Math.round(offX)}px, ${Math.round(offY)}px, 0) scale(${scale.toFixed(4)})`;
-
-      const t1In = clamp((p - 0.1) / 0.2, 0, 1);
-      const t1Out = clamp((p - 0.42) / 0.13, 0, 1);
-      const t1Op = easeOut(t1In) * (1 - easeOut(t1Out));
-      const t1Y = (1 - easeOut(t1In)) * vh * 0.55 + -easeOut(t1Out) * vh * 0.18;
-      t1.style.setProperty("--y", `${t1Y.toFixed(2)}px`);
-      t1.style.opacity = t1Op.toFixed(3);
-
-      const t2In = clamp((p - 0.5) / 0.2, 0, 1);
-      const t2Out = clamp((p - 0.82) / 0.18, 0, 1);
-      const t2Op = easeOutQ(t2In) * (1 - easeOut(t2Out));
-      const t2Y =
-        (1 - easeOutQ(t2In)) * vh * 0.55 + -easeOut(t2Out) * vh * 0.18;
-      t2.style.setProperty("--y", `${t2Y.toFixed(2)}px`);
-      t2.style.opacity = t2Op.toFixed(3);
-    };
-
-    const onScroll = () => {
-      if (scheduled) return;
-      scheduled = true;
-      requestAnimationFrame(() => {
-        const rect = section.getBoundingClientRect();
-        const total = section.offsetHeight - vh;
-        const scrolled = clamp(-rect.top, 0, total);
-        const p = total > 0 ? scrolled / total : 0;
-        applyFrame(p, rect);
-        scheduled = false;
-      });
-    };
-
-    // Refresh viewport + measurements only on a real resize. On touch devices
-    // a height-only change is the iOS toolbar — ignore it to avoid jitter.
-    const syncViewport = () => {
-      if (coarse && window.innerWidth === vw) return;
-      vw = window.innerWidth;
-      vh = window.innerHeight;
-      remeasure();
-    };
-
-    const onResize = () => {
-      syncViewport();
-      onScroll();
-    };
-
-    measureNatural();
-    onScroll();
-
-    const ro = new ResizeObserver(() => {
-      syncViewport();
-      onScroll();
-    });
-    ro.observe(section);
-    const aboutEl = document.querySelector(".home__about");
-    if (aboutEl) ro.observe(aboutEl);
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => {
-        remeasure();
-        onScroll();
-      });
-    }
-
-    const onImgLoad = () => {
-      remeasure();
-      onScroll();
-    };
-    const innerImg = img.querySelector("img");
-    if (innerImg) {
-      if ((innerImg as HTMLImageElement).complete) {
-        onImgLoad();
-      } else {
-        innerImg.addEventListener("load", onImgLoad, { once: true });
-      }
-    }
-
-    const onLoad = () => {
-      remeasure();
-      onScroll();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
-    window.addEventListener("load", onLoad);
-
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("load", onLoad);
-      if (innerImg) innerImg.removeEventListener("load", onImgLoad);
-    };
-  }, []);
-
   return (
-    <main className="home">
-      <section className="home__hero" aria-labelledby="home-hero-title">
-        <div className="home__hero-media" aria-hidden="true">
-          {heroSlides.map((_, i) => (
-            <div
-              key={i}
-              className={
-                `home__hero-pattern home__hero-pattern--${i + 1}` +
-                (i === activeSlide ? " home__hero-pattern--active" : "")
-              }
-            />
-          ))}
-          <div className="home__hero-scrim" />
-          <div className="home__hero-glow" />
+    <main className="home" id="main">
+      {/* ============================================ HERO */}
+      <section className="hero surface surface--dark" aria-labelledby="hero-title">
+        <div className="hero__bg" aria-hidden="true">
+          <img
+            src="/hh1.webp"
+            alt=""
+            width={1600}
+            height={1100}
+            fetchPriority="high"
+            decoding="async"
+          />
+          <span className="hero__scrim" />
         </div>
 
-        <div className="home__hero-panel">
-          <div className="home__hero-panel-inner">
-            <div className="home__hero-stage">
-              <div
-                key={activeSlide}
-                id={`hero-panel-${activeSlide}`}
-                role="tabpanel"
-                aria-labelledby={`hero-tab-${activeSlide}`}
-                className="home__hero-slide"
-              >
-                <span className="home__hero-label">
-                  {t(heroSlides[activeSlide].label)}
-                </span>
-                <h1 id="home-hero-title" className="home__hero-title">
-                  {t(heroSlides[activeSlide].title).map((line, i) => (
-                    <span key={i} className="home__hero-line">
-                      {line}
-                    </span>
-                  ))}
-                </h1>
-                <p className="home__hero-body">
-                  {t(heroSlides[activeSlide].body)}
-                </p>
-              </div>
-            </div>
-
-            <div className="home__hero-controls">
-              <button
-                type="button"
-                className="home__hero-nav"
-                onClick={() => goTo(activeSlide - 1)}
-                aria-label={t({
-                  en: "Previous slide",
-                  fr: "Diapositive précédente",
+        <div className="container hero__inner">
+          <div className="hero__copy">
+            <Reveal as="span" className="kicker hero__kicker" y={12}>
+              {t({ en: "Welcome to BICF", fr: "Bienvenue à la BICF" })}
+            </Reveal>
+            <Reveal
+              as="h1"
+              id="hero-title"
+              className="h-display hero__title"
+              delay={0.06}
+            >
+              {t({
+                en: "Empowering Black Immigrants to ",
+                fr: "Outiller les immigrants noirs pour ",
+              })}
+              <span className="accent-word">
+                {t({
+                  en: "Thrive and Lead",
+                  fr: "qu'ils s'épanouissent et dirigent",
                 })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M15 6L9 12L15 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              <div
-                className="home__hero-bars"
-                role="tablist"
-                aria-label={t({ en: "Hero slides", fr: "Diapositives" })}
-                onKeyDown={onTabsKeyDown}
-              >
-                {heroSlides.map((_, i) => (
-                  <button
-                    key={i}
-                    ref={(el) => {
-                      tabsRef.current[i] = el;
-                    }}
-                    type="button"
-                    role="tab"
-                    id={`hero-tab-${i}`}
-                    aria-controls={`hero-panel-${i}`}
-                    aria-selected={i === activeSlide}
-                    tabIndex={i === activeSlide ? 0 : -1}
-                    aria-label={t({
-                      en: `Go to slide ${i + 1}`,
-                      fr: `Aller à la diapositive ${i + 1}`,
-                    })}
-                    className={`home__hero-bar ${i === activeSlide ? "home__hero-bar--active" : ""}`}
-                    onClick={() => setActiveSlide(i)}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                className="home__hero-nav"
-                onClick={() => goTo(activeSlide + 1)}
-                aria-label={t({
-                  en: "Next slide",
-                  fr: "Diapositive suivante",
-                })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M9 6L15 12L9 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="home__hero-meta">
-              <span>Ajax, Ontario</span>
-              <span aria-hidden="true">·</span>
-              <span>(905) 931 3776</span>
-            </div>
+              </span>
+            </Reveal>
+            <Reveal as="p" className="lead hero__lead" delay={0.12}>
+              {t({
+                en: "Creating opportunities, promoting justice, and building community for Black immigrants everywhere.",
+                fr: "Créer des possibilités, promouvoir la justice et bâtir une communauté pour les immigrants noirs partout.",
+              })}
+            </Reveal>
+            <Reveal as="div" className="hero__actions" delay={0.18}>
+              <Link to="/contact" className="btn btn--primary">
+                {t({ en: "Get Support", fr: "Obtenir du soutien" })}
+              </Link>
+              <Link to="/about" className="btn btn--outline">
+                {t({ en: "Learn More", fr: "En savoir plus" })}
+              </Link>
+            </Reveal>
           </div>
         </div>
       </section>
 
-      <section className="home__intro" aria-labelledby="home-intro-title">
-        <h2 id="home-intro-title" className="home__intro-title">
-          <span className="home__intro-line">
-            {t({ en: "One community.", fr: "Une communauté." })}
-          </span>
-          <span className="home__intro-line">
-            <span>{t({ en: "Endless", fr: "Espoir" })}</span>
-            <span className="home__intro-face" aria-hidden="true">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={faceIndex}
-                  src={INTRO_FACES[faceIndex]}
-                  alt=""
-                  width={110}
-                  height={110}
-                  decoding="async"
-                  initial={{ opacity: 0, scale: 0.75, rotate: -4 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.85, rotate: 4 }}
-                  transition={{ duration: 0.5, ease: HERO_EASE }}
-                />
-              </AnimatePresence>
-            </span>
-            <span>{t({ en: "hope.", fr: "infini." })}</span>
-          </span>
-        </h2>
-
-        <p className="home__intro-body">
-          {t({
-            en: "The Black Immigrants Community Foundation walks alongside families building new lives through advocacy, opportunity, and unwavering support.",
-            fr: "La Black Immigrants Community Foundation accompagne les familles qui bâtissent une nouvelle vie par la défense des droits, les possibilités et un soutien indéfectible.",
-          })}
-        </p>
-      </section>
-
+      {/* ============================================ STORY + FOUNDATIONS */}
       <section
-        ref={storyRef}
-        className="home__story"
-        aria-label={t({ en: "Brand story", fr: "Histoire de la marque" })}
+        className="story surface surface--light sheet"
+        aria-labelledby="story-title"
       >
-        <div className="home__story-stage">
-          <div className="home__story-stage-inner">
-            <div
-              ref={t2Ref}
-              className="home__story-text home__story-text--left"
-            >
-              <span className="home__story-label">
-                {t({ en: "Built together", fr: "Bâti ensemble" })}
-              </span>
-              {t({
-                en: (
-                  <>
-                    Resources
-                    <br />
-                    that build
-                    <br />a steady home.
-                  </>
-                ),
-                fr: (
-                  <>
-                    Des ressources
-                    <br />
-                    qui bâtissent
-                    <br />un foyer stable.
-                  </>
-                ),
-              })}
+        <div className="container">
+          <div className="story__grid">
+            <div className="story__copy">
+              <Reveal as="span" className="kicker">
+                {t({ en: "About BICF", fr: "À propos de la BICF" })}
+              </Reveal>
+              <Reveal
+                as="h2"
+                id="story-title"
+                className="h1 story__title"
+                delay={0.05}
+              >
+                {t({
+                  en: "One community. Endless hope.",
+                  fr: "Une communauté. Espoir infini.",
+                })}
+              </Reveal>
+              <Reveal as="p" className="lead" delay={0.1}>
+                {t({
+                  en: "The Black Immigrants Community Foundation (BICF) is a nonprofit organization dedicated to supporting and empowering Black immigrants through advocacy, resources, and community building initiatives.",
+                  fr: "La Black Immigrants Community Foundation (BICF) est un organisme sans but lucratif voué au soutien et à l'autonomisation des immigrants noirs par la défense des droits, les ressources et des initiatives de renforcement communautaire.",
+                })}
+              </Reveal>
+              <Reveal as="p" className="body story__body" delay={0.14}>
+                {t({
+                  en: "We walk alongside families building new lives through advocacy, opportunity, and unwavering support.",
+                  fr: "Nous accompagnons les familles qui bâtissent une nouvelle vie par la défense des droits, les possibilités et un soutien indéfectible.",
+                })}
+              </Reveal>
+              <Reveal as="div" delay={0.2}>
+                <Link to="/about" className="btn btn--solid">
+                  {t({ en: "Learn More About Us", fr: "En savoir plus sur nous" })}
+                </Link>
+              </Reveal>
             </div>
-            <div
-              ref={t1Ref}
-              className="home__story-text home__story-text--right"
-            >
-              <span className="home__story-label">
-                {t({ en: "For every arrival", fr: "Pour chaque arrivée" })}
-              </span>
-              {t({
-                en: (
-                  <>
-                    Advocacy
-                    <br />
-                    that meets
-                    <br />
-                    the moment.
-                  </>
-                ),
-                fr: (
-                  <>
-                    Une défense
-                    <br />
-                    à la hauteur
-                    <br />
-                    du moment.
-                  </>
-                ),
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="home__about" id="about" aria-labelledby="about-title">
-        <div className="home__about-grid">
-          <div className="home__about-content">
-            <div className="home__about-eyebrow">
-              {t({ en: "About BICF", fr: "À propos de la BICF" })}
-            </div>
-            <p className="home__about-body">
-              {t({
-                en: "The Black Immigrants Community Foundation (BICF) is a nonprofit organization dedicated to supporting and empowering Black immigrants through advocacy, resources, and community building initiatives.",
-                fr: "La Black Immigrants Community Foundation (BICF) est un organisme sans but lucratif voué au soutien et à l'autonomisation des immigrants noirs par la défense des droits, les ressources et des initiatives de renforcement communautaire.",
-              })}
-            </p>
-            <Link className="home__about-btn" to="/about">
-              {t({ en: "Learn More", fr: "En savoir plus" })}
-            </Link>
-          </div>
-
-          <div className="home__about-media">
-            <div
-              ref={imgRef}
-              className="home__about-image"
-              data-animating="false"
-            >
+            <Reveal as="figure" className="story__media" delay={0.12} y={30}>
               <img
                 src="/h4.webp"
                 alt={t({
-                  en: "Black immigrant family",
-                  fr: "Famille d'immigrants noirs",
+                  en: "A Black immigrant family supported by BICF",
+                  fr: "Une famille d'immigrants noirs accompagnée par la BICF",
                 })}
                 width={720}
                 height={960}
-                decoding="async"
                 loading="lazy"
+                decoding="async"
               />
+            </Reveal>
+          </div>
+
+          <ul className="story__pillars">
+            {principles.map((pr, i) => (
+              <Reveal
+                as="li"
+                className="pillar"
+                key={pr.eyebrow.en}
+                delay={i * 0.08}
+              >
+                <h3 className="h3 pillar__label">{t(pr.eyebrow)}</h3>
+                <p className="lead pillar__body">{t(pr.body)}</p>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ============================================ FUNDERS */}
+      <section
+        className="backing surface surface--tint"
+        aria-labelledby="backing-title"
+      >
+        <div className="container">
+          <Reveal as="header" className="backing__head">
+            <span className="kicker">
+              {t({ en: "Supported By", fr: "Soutenu par" })}
+            </span>
+            <h2 id="backing-title" className="h2 backing__title">
+              {t({
+                en: "Proudly funded by leading organizations.",
+                fr: "Fièrement financé par des organisations de premier plan.",
+              })}
+            </h2>
+          </Reveal>
+
+          <Reveal as="ul" className="backing__strip" delay={0.08}>
+            {sponsors.map((sp) => (
+              <li className="backer" key={sp.name.en}>
+                <a
+                  href={sp.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t(sp.name)}
+                >
+                  <span
+                    className={`backer__frame${
+                      sp.dark ? " backer__frame--tile" : ""
+                    }`}
+                  >
+                    <img
+                      src={sp.src}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                  <span className="backer__name">{t(sp.short)}</span>
+                </a>
+              </li>
+            ))}
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ============================================ PROGRAMS */}
+      <section
+        className="programs surface surface--dark"
+        id="programs"
+        aria-labelledby="programs-title"
+      >
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "Our Services", fr: "Nos services" })}
+              </Reveal>
+              <Reveal as="h2" id="programs-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Comprehensive support for the Black immigrant community.",
+                  fr: "Un soutien complet pour la communauté immigrante noire.",
+                })}
+              </Reveal>
+            </div>
+            <Reveal as="div" className="section-head__aside" delay={0.1}>
+              <p className="body">
+                {t({
+                  en: "Legal guidance, educational pathways, wellness, and employment support. Every service is built so Black immigrants don't just survive, they thrive.",
+                  fr: "Accompagnement juridique, parcours éducatifs, mieux-être et soutien à l'emploi. Chaque service est conçu pour que les immigrants noirs ne se contentent pas de survivre, mais s'épanouissent.",
+                })}
+              </p>
+              <Link to="/services" className="link-arrow">
+                {t({ en: "View All Services", fr: "Voir tous les services" })}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path
+                    d="M3 8h10M9 4l4 4-4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
+            </Reveal>
+          </header>
+
+          <ul className="programs__grid">
+            {services.map((s, i) => (
+              <Reveal as="li" key={s.label.en} delay={(i % 3) * 0.07}>
+                <Link to="/services" className="program">
+                  <div className="program__media">
+                    <img
+                      src={s.image}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div className="program__body">
+                    <span className="program__tag">{t(s.tag)}</span>
+                    <h3 className="h3 program__title">{t(s.label)}</h3>
+                    <p className="body program__text">{t(s.body)}</p>
+                    <span className="link-arrow program__link">
+                      {t({ en: "Learn more", fr: "En savoir plus" })}
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path
+                          d="M3 8h10M9 4l4 4-4 4"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ============================================ FEATURE ROWS */}
+      <section
+        className="feature surface surface--light sheet"
+        aria-labelledby="feature-title"
+      >
+        <div className="container">
+          <div className="feature__row">
+            <Reveal as="figure" className="feature__media" y={30}>
+              <img
+                src="/hh2.webp"
+                alt=""
+                width={1200}
+                height={900}
+                loading="lazy"
+                decoding="async"
+              />
+            </Reveal>
+            <div className="feature__copy">
+              <Reveal as="span" className="kicker">
+                {t({ en: "For every arrival", fr: "Pour chaque arrivée" })}
+              </Reveal>
+              <Reveal as="h2" id="feature-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Advocacy that meets the moment.",
+                  fr: "Une défense à la hauteur du moment.",
+                })}
+              </Reveal>
+              <Reveal as="p" className="lead" delay={0.1}>
+                {t({
+                  en: "BICF amplifies the voices of Black immigrants through grassroots organizing, public education, and policy reform. The people most affected shape the decisions that affect them.",
+                  fr: "La BICF amplifie la voix des immigrants noirs par la mobilisation citoyenne, l'éducation du public et la réforme des politiques. Les personnes les plus touchées façonnent les décisions qui les concernent.",
+                })}
+              </Reveal>
+              <Reveal as="div" delay={0.15}>
+                <Link to="/research" className="btn btn--solid">
+                  {t({ en: "See our research", fr: "Voir notre recherche" })}
+                </Link>
+              </Reveal>
+            </div>
+          </div>
+
+          <div className="feature__row feature__row--reverse">
+            <Reveal as="figure" className="feature__media" y={30}>
+              <img
+                src="/hh3.webp"
+                alt=""
+                width={1200}
+                height={900}
+                loading="lazy"
+                decoding="async"
+              />
+            </Reveal>
+            <div className="feature__copy">
+              <Reveal as="span" className="kicker">
+                {t({ en: "Built together", fr: "Bâti ensemble" })}
+              </Reveal>
+              <Reveal as="h2" className="h2" delay={0.05}>
+                {t({
+                  en: "Resources that build a steady home.",
+                  fr: "Des ressources qui bâtissent un foyer stable.",
+                })}
+              </Reveal>
+              <Reveal as="p" className="lead" delay={0.1}>
+                {t({
+                  en: "The programs that help families land safely, build stability, and feel at home from day one. Housing, healthcare, financial literacy, and digital access.",
+                  fr: "Les programmes qui aident les familles à arriver en sécurité, à bâtir leur stabilité et à se sentir chez elles dès le premier jour. Logement, santé, littératie financière et accès numérique.",
+                })}
+              </Reveal>
+              <Reveal as="div" delay={0.15}>
+                <Link to="/services" className="btn btn--solid">
+                  {t({ en: "Browse programs", fr: "Parcourir les programmes" })}
+                </Link>
+              </Reveal>
             </div>
           </div>
         </div>
       </section>
 
+      {/* ============================================ VOICES */}
       <section
-        className="home__principles"
-        id="principles"
-        aria-labelledby="home-principles-title"
+        className="voices surface surface--tint"
+        aria-labelledby="voices-title"
       >
-        <div className="home__principles-aurora" aria-hidden="true" />
-        <div className="home__principles-container">
-          <header className="home__principles-head">
-            <motion.span
-              className="home__principles-kicker"
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: HERO_EASE }}
-            >
-              {t({ en: "Foundations", fr: "Fondements" })}
-            </motion.span>
-            <motion.h2
-              id="home-principles-title"
-              className="home__principles-title"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: HERO_EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "What we stand for, and where we're going.",
-                fr: "Ce que nous défendons, et là où nous allons.",
-              })}
-            </motion.h2>
+        <div className="container">
+          <header className="section-head section-head--center">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "Community Voices", fr: "Voix de la communauté" })}
+              </Reveal>
+              <Reveal as="h2" id="voices-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Hear from those we've supported.",
+                  fr: "Écoutez celles et ceux que nous avons accompagnés.",
+                })}
+              </Reveal>
+            </div>
           </header>
 
-          <div className="home__principles-grid">
-            {principles.map((p, i) => (
-              <motion.article
-                key={p.eyebrow.en}
-                className="home__principle"
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{
-                  duration: 0.85,
-                  ease: HERO_EASE,
-                  delay: 0.1 + i * 0.12,
-                }}
+          <ul className="voices__grid">
+            {testimonials.map((v, i) => (
+              <Reveal
+                as="li"
+                className="voice"
+                key={v.name}
+                delay={(i % 3) * 0.07}
               >
-                <span className="home__principle-eyebrow">
-                  {t(p.eyebrow)}
-                </span>
-                <p className="home__principle-body">{t(p.body)}</p>
-              </motion.article>
-            ))}
-          </div>
-
-          <div className="home__principles-cta-wrap">
-            <Link className="home__principles-cta" to="/about">
-              {t({ en: "Learn More", fr: "En savoir plus" })}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="home__services"
-        id="services"
-        aria-labelledby="home-services-title"
-      >
-        <div className="home__services-aurora" aria-hidden="true" />
-        <div className="home__services-container">
-          <header className="home__services-head">
-            <motion.span
-              className="home__services-kicker"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.7, ease: HERO_EASE }}
-            >
-              {t({ en: "Our Services", fr: "Nos services" })}
-            </motion.span>
-            <motion.h2
-              id="home-services-title"
-              className="home__services-title"
-              initial={{ opacity: 0, y: 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: HERO_EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "Programs built around the realities of Black immigrant life.",
-                fr: "Des programmes conçus autour des réalités de la vie des immigrants noirs.",
-              })}
-            </motion.h2>
-          </header>
-
-          <div className="home__services-stack">
-            {services.map((s, i) => (
-              <article
-                key={s.label.en}
-                className="home__service-card"
-                data-align={i % 2 === 0 ? "left" : "right"}
-                style={{
-                  top: `calc(2rem + ${i * 1.25}rem)`,
-                  zIndex: i + 1,
-                }}
-              >
-                <div className="home__service-media">
-                  <img
-                    src={s.image}
-                    alt={`${t(s.label)}, ${t(s.tag)}`}
-                    width={1200}
-                    height={900}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span className="home__service-badge">
-                    <span className="home__service-badge-num">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="home__service-badge-text">
-                      {t(s.tag)}
-                    </span>
-                  </span>
-                </div>
-
-                <div className="home__service-content">
-                  <span className="home__service-eyebrow">
-                    <span className="home__service-dot" aria-hidden="true" />
-                    {t({ en: "BICF Services", fr: "Services de la BICF" })}
-                  </span>
-                  <h3 className="home__service-label">{t(s.label)}</h3>
-                  <p className="home__service-body">{t(s.body)}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="home__services-cta-wrap">
-            <Link className="home__services-cta" to="/services">
-              {t({ en: "Learn More", fr: "En savoir plus" })}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="home__voices"
-        id="voices"
-        aria-labelledby="home-voices-title"
-      >
-        <div className="home__voices-container">
-          <header className="home__voices-head">
-            <motion.span
-              className="home__voices-kicker"
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: HERO_EASE }}
-            >
-              {t({ en: "Community Voices", fr: "Voix de la communauté" })}
-            </motion.span>
-            <motion.h2
-              id="home-voices-title"
-              className="home__voices-title"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: HERO_EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "Stories from those we walk beside.",
-                fr: "Des récits de ceux et celles que nous accompagnons.",
-              })}
-            </motion.h2>
-          </header>
-
-          <div className="home__voices-stage">
-            <AnimatePresence mode="wait">
-              <motion.figure
-                key={testimonialIndex}
-                className="home__voice"
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.55, ease: HERO_EASE }}
-              >
-                <svg
-                  className="home__voice-mark"
-                  viewBox="0 0 32 24"
-                  fill="none"
-                  aria-hidden="true"
-                >
+                <svg className="voice__mark" viewBox="0 0 32 24" fill="none" aria-hidden="true">
                   <path
                     d="M0 24V14.4C0 10.4 0.8 7.2 2.4 4.8C4 2.4 6.4 0.8 9.6 0L11.2 3.2C9.6 4 8.4 4.8 7.6 5.6C6.8 6.4 6.4 7.6 6.4 9.2H12V24H0ZM20 24V14.4C20 10.4 20.8 7.2 22.4 4.8C24 2.4 26.4 0.8 29.6 0L31.2 3.2C29.6 4 28.4 4.8 27.6 5.6C26.8 6.4 26.4 7.6 26.4 9.2H32V24H20Z"
                     fill="currentColor"
                   />
                 </svg>
-                <blockquote className="home__voice-quote">
-                  {t(testimonials[testimonialIndex].quote)}
-                </blockquote>
-                <figcaption className="home__voice-meta">
-                  <span className="home__voice-name">
-                    {testimonials[testimonialIndex].name}
+                <blockquote className="voice__quote">{t(v.quote)}</blockquote>
+                <div className="voice__meta">
+                  <span className="voice__initial" aria-hidden="true">
+                    {v.name.charAt(0)}
                   </span>
-                  <span className="home__voice-role">
-                    {t(testimonials[testimonialIndex].role)}
-                  </span>
-                </figcaption>
-              </motion.figure>
-            </AnimatePresence>
-          </div>
-
-          <div className="home__voices-controls">
-            <button
-              type="button"
-              className="home__voices-nav"
-              onClick={() => goToTestimonial(testimonialIndex - 1)}
-              aria-label={t({
-                en: "Previous testimonial",
-                fr: "Témoignage précédent",
-              })}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M15 6L9 12L15 18"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            <div
-              className="home__voices-dots"
-              role="tablist"
-              aria-label={t({ en: "Testimonials", fr: "Témoignages" })}
-            >
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  role="tab"
-                  aria-selected={i === testimonialIndex}
-                  aria-label={t({
-                    en: `Go to testimonial ${i + 1}`,
-                    fr: `Aller au témoignage ${i + 1}`,
-                  })}
-                  className={`home__voices-dot ${i === testimonialIndex ? "home__voices-dot--active" : ""}`}
-                  onClick={() => setTestimonialIndex(i)}
-                />
-              ))}
-            </div>
-
-            <button
-              type="button"
-              className="home__voices-nav"
-              onClick={() => goToTestimonial(testimonialIndex + 1)}
-              aria-label={t({
-                en: "Next testimonial",
-                fr: "Témoignage suivant",
-              })}
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M9 6L15 12L9 18"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="home__sponsors"
-        id="supporters"
-        aria-labelledby="home-sponsors-title"
-      >
-        <div className="home__sponsors-container">
-          <header className="home__sponsors-head">
-            <motion.span
-              className="home__sponsors-kicker"
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.6, ease: HERO_EASE }}
-            >
-              {t({ en: "Supported By", fr: "Soutenu par" })}
-            </motion.span>
-            <motion.h2
-              id="home-sponsors-title"
-              className="home__sponsors-title"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-12%" }}
-              transition={{ duration: 0.85, ease: HERO_EASE, delay: 0.08 }}
-            >
-              {t({
-                en: "Proudly funded by leading Canadian institutions and community partners.",
-                fr: "Fièrement financé par d'éminentes institutions canadiennes et des partenaires communautaires.",
-              })}
-            </motion.h2>
-          </header>
-
-          <motion.p
-            className="home__sponsors-intro"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.7, ease: HERO_EASE, delay: 0.16 }}
-          >
-            {t({
-              en: "BICF's programs are sustained by a network of public funders and community foundations who share our commitment to long term equity for Black immigrants in Canada. Their continued investment makes our coordinated, no cost services possible.",
-              fr: "Les programmes de la BICF sont soutenus par un réseau de bailleurs de fonds publics et de fondations communautaires qui partagent notre engagement envers une équité durable pour les immigrants noirs au Canada. Leur investissement continu rend possibles nos services coordonnés et gratuits.",
-            })}
-          </motion.p>
-
-          <ul className="home__sponsors-grid">
-            {sponsors.map((s, i) => (
-              <motion.li
-                key={s.name.en}
-                className="home__sponsor"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8%" }}
-                transition={{ duration: 0.7, ease: HERO_EASE, delay: i * 0.08 }}
-              >
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="home__sponsor-link"
-                  aria-label={t(s.name)}
-                >
-                  <img
-                    src={s.src}
-                    alt={t(s.name)}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </a>
-                <span className="home__sponsor-name">{t(s.short)}</span>
-              </motion.li>
+                  <span className="voice__name">{v.name}</span>
+                </div>
+              </Reveal>
             ))}
           </ul>
         </div>
       </section>
 
+      {/* ============================================ GET INVOLVED */}
       <section
-        className="home__join"
-        id="join"
-        aria-labelledby="home-join-title"
+        className="involve surface surface--dark"
+        id="get-involved"
+        aria-labelledby="involve-title"
       >
-        <div className="home__join-aurora" aria-hidden="true" />
-        <div className="home__join-container">
-          <motion.span
-            className="home__join-kicker"
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.6, ease: HERO_EASE }}
-          >
-            {t({ en: "Get Involved", fr: "Participer" })}
-          </motion.span>
-          <motion.h2
-            id="home-join-title"
-            className="home__join-title"
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.85, ease: HERO_EASE, delay: 0.08 }}
-          >
-            {t({ en: "Join the movement.", fr: "Joignez-vous au mouvement." })}
-          </motion.h2>
-          <motion.p
-            className="home__join-body"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.7, ease: HERO_EASE, delay: 0.16 }}
-          >
-            {t({
-              en: "Together, we can create lasting change for Black immigrants in our communities. Volunteer your time, partner with us, or simply share our story.",
-              fr: "Ensemble, nous pouvons créer un changement durable pour les immigrants noirs de nos communautés. Donnez de votre temps, devenez partenaire ou partagez simplement notre histoire.",
-            })}
-          </motion.p>
-          <motion.div
-            className="home__join-actions"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12%" }}
-            transition={{ duration: 0.7, ease: HERO_EASE, delay: 0.24 }}
-          >
-            <Link
-              className="home__join-cta home__join-cta--primary"
-              to="/volunteer"
-            >
-              {t({ en: "Volunteer", fr: "Bénévolat" })}
-            </Link>
-            <Link
-              className="home__join-cta home__join-cta--ghost"
-              to="/contact"
-            >
-              {t({ en: "Get In Touch", fr: "Nous joindre" })}
-            </Link>
-          </motion.div>
+        <div className="container">
+          <div className="involve__grid">
+            <div className="involve__intro">
+              <Reveal as="span" className="kicker">
+                {t({ en: "Get Involved", fr: "Participer" })}
+              </Reveal>
+              <Reveal as="h2" id="involve-title" className="h2" delay={0.05}>
+                {t({ en: "Join the Movement.", fr: "Joignez-vous au mouvement." })}
+              </Reveal>
+              <Reveal as="p" className="lead involve__lead" delay={0.1}>
+                {t({
+                  en: "Together, we can create lasting change for Black immigrants in our communities.",
+                  fr: "Ensemble, nous pouvons créer un changement durable pour les immigrants noirs de nos communautés.",
+                })}
+              </Reveal>
+              <Reveal as="div" delay={0.16}>
+                <Link to="/contact" className="btn btn--primary">
+                  {t({ en: "Get In Touch", fr: "Nous Contacter" })}
+                </Link>
+              </Reveal>
+            </div>
+
+            <ul className="involve__list">
+              {involvement.map((it, i) => (
+                <Reveal
+                  as="li"
+                  className="involve__item"
+                  key={it.title.en}
+                  delay={i * 0.07}
+                >
+                  <div>
+                    <h3 className="h3 involve__title">{t(it.title)}</h3>
+                    <p className="body involve__body">{t(it.body)}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section className="home__faqs" aria-labelledby="home-faqs-title">
-        <div className="home__faqs-container">
-          <motion.header
-            className="home__faqs-head"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15%" }}
-            transition={{ duration: 0.85, ease: HERO_EASE }}
-          >
-            <h2 id="home-faqs-title" className="home__faqs-title">
-              FAQ
-            </h2>
-          </motion.header>
+      {/* ============================================ FAQ */}
+      <section
+        className="faq surface surface--light sheet"
+        aria-labelledby="faq-title"
+      >
+        <div className="container">
+          <div className="faq__grid">
+            <div className="faq__aside">
+              <Reveal as="span" className="kicker">
+                {t({ en: "Questions", fr: "Questions" })}
+              </Reveal>
+              <Reveal as="h2" id="faq-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Frequently asked questions",
+                  fr: "Questions fréquentes",
+                })}
+              </Reveal>
+              <Reveal as="p" className="body faq__aside-text" delay={0.1}>
+                {t({
+                  en: "Can't find what you're looking for? Our team is one message away.",
+                  fr: "Vous ne trouvez pas ce que vous cherchez? Notre équipe est à un message d'ici.",
+                })}
+              </Reveal>
+              <Reveal as="div" delay={0.14}>
+                <Link to="/contact" className="btn btn--solid">
+                  {t({ en: "Contact us", fr: "Nous contacter" })}
+                </Link>
+              </Reveal>
+            </div>
 
-          <ul className="home__faqs-list">
-            {homeFaqs.map((item, i) => {
-              const isOpen = openFaq === i;
-              const num = String(i + 1).padStart(2, "0");
-              return (
-                <motion.li
-                  key={i}
-                  className={`home__faq ${isOpen ? "home__faq--open" : ""}`}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-10%" }}
-                  transition={{
-                    duration: 0.65,
-                    ease: HERO_EASE,
-                    delay: i * 0.04,
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="home__faq-trigger"
-                    onClick={() => setOpenFaq(isOpen ? null : i)}
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-panel-${i}`}
-                    id={`faq-button-${i}`}
+            <ul className="faq__list">
+              {homeFaqs.map((item, i) => {
+                const isOpen = openFaq === i;
+                return (
+                  <li
+                    className={`faq__item ${isOpen ? "faq__item--open" : ""}`}
+                    key={item.q.en}
                   >
-                    <span className="home__faq-num">{num}</span>
-                    <span className="home__faq-q">{t(item.q)}</span>
-                    <motion.span
-                      className="home__faq-icon"
-                      animate={{ rotate: isOpen ? 45 : 0 }}
-                      transition={{ duration: 0.35, ease: HERO_EASE }}
-                      aria-hidden="true"
-                    >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
+                    <h3>
+                      <button
+                        type="button"
+                        className="faq__trigger"
+                        onClick={() => setOpenFaq(isOpen ? null : i)}
+                        aria-expanded={isOpen}
+                        aria-controls={`faq-panel-${i}`}
+                        id={`faq-button-${i}`}
                       >
-                        <path
-                          d="M7 1V13M1 7H13"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </motion.span>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key="panel"
-                        id={`faq-panel-${i}`}
-                        role="region"
-                        aria-labelledby={`faq-button-${i}`}
-                        className="home__faq-panel"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: HERO_EASE }}
-                      >
-                        <p className="home__faq-a">{t(item.a)}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.li>
-              );
-            })}
-          </ul>
+                        <span className="faq__q">{t(item.q)}</span>
+                        <span className="faq__icon" aria-hidden="true">
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path
+                              d="M7 1V13M1 7H13"
+                              stroke="currentColor"
+                              strokeWidth="1.7"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </span>
+                      </button>
+                    </h3>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          key="panel"
+                          id={`faq-panel-${i}`}
+                          role="region"
+                          aria-labelledby={`faq-button-${i}`}
+                          className="faq__panel"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.34, ease: EASE }}
+                        >
+                          <p className="faq__a">{t(item.a)}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
       </section>
     </main>

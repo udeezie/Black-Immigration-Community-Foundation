@@ -1,96 +1,15 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+/* About page. Content arrays first, composition below. */
+
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { useLocation, useNavigationType } from "react-router-dom";
 import { useLanguage, type Lang } from "../../context/LanguageContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./About.scss";
 
 type Bi = Record<Lang, string>;
 
-const ease = [0.25, 0.46, 0.45, 0.94] as const;
-
-const motionMap = {
-  div: motion.div,
-  span: motion.span,
-  p: motion.p,
-  h1: motion.h1,
-  h2: motion.h2,
-  h3: motion.h3,
-  li: motion.li,
-  section: motion.section,
-} as const;
-
-type RevealTag = keyof typeof motionMap;
-
-type RevealProps = {
-  children: ReactNode;
-  delay?: number;
-  y?: number;
-  duration?: number;
-  className?: string;
-  as?: RevealTag;
-  id?: string;
-};
-
-function Reveal({
-  children,
-  delay = 0,
-  y = 40,
-  duration = 0.85,
-  className,
-  as = "div",
-  id,
-}: RevealProps) {
-  const Comp = motionMap[as];
-  return (
-    <Comp
-      id={id}
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-12%" }}
-      transition={{ duration, delay, ease }}
-    >
-      {children}
-    </Comp>
-  );
-}
-
-function useScrollRestoration(storageKey = "scroll") {
-  const { key, pathname } = useLocation();
-  const navType = useNavigationType();
-
-  useEffect(() => {
-    if ("scrollRestoration" in window.history) {
-      window.history.scrollRestoration = "manual";
-    }
-  }, []);
-
-  useEffect(() => {
-    const save = () => {
-      sessionStorage.setItem(`${storageKey}:${key}`, String(window.scrollY));
-    };
-    window.addEventListener("pagehide", save);
-    window.addEventListener("beforeunload", save);
-    return () => {
-      save();
-      window.removeEventListener("pagehide", save);
-      window.removeEventListener("beforeunload", save);
-    };
-  }, [key, storageKey]);
-
-  useEffect(() => {
-    const saved = sessionStorage.getItem(`${storageKey}:${key}`);
-    if (navType === "POP" && saved !== null) {
-      const y = parseInt(saved, 10);
-      requestAnimationFrame(() => {
-        window.scrollTo(0, y);
-        requestAnimationFrame(() => window.scrollTo(0, y));
-      });
-    } else {
-      window.scrollTo(0, 0);
-    }
-  }, [pathname, key, navType, storageKey]);
-}
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const pillars: { label: Bi; tag: Bi; body: Bi; image: string }[] = [
   {
@@ -155,10 +74,7 @@ const values: { title: Bi; body: Bi }[] = [
     },
   },
   {
-    title: {
-      en: "Integrity & Transparency",
-      fr: "Intégrité et transparence",
-    },
+    title: { en: "Integrity & Transparency", fr: "Intégrité et transparence" },
     body: {
       en: "We hold ourselves to the highest standards of honesty, accountability, and ethical conduct. We are committed to maintaining transparency in our operations, communications, and decision making processes. We build trust by acting with integrity and ensuring that our actions align with the needs and expectations of the communities we serve.",
       fr: "Nous nous tenons aux normes les plus élevées d'honnêteté, de responsabilité et de conduite éthique. Nous nous engageons à maintenir la transparence dans nos opérations, nos communications et nos processus décisionnels. Nous bâtissons la confiance en agissant avec intégrité et en veillant à ce que nos actions répondent aux besoins et aux attentes des communautés que nous servons.",
@@ -222,10 +138,7 @@ const services: { title: Bi; body: Bi }[] = [
     },
   },
   {
-    title: {
-      en: "Mental Health and Wellness",
-      fr: "Santé mentale et mieux-être",
-    },
+    title: { en: "Mental Health and Wellness", fr: "Santé mentale et mieux-être" },
     body: {
       en: "Access to culturally aware counseling and wellness workshops.",
       fr: "Accès à du counseling sensible à la culture et à des ateliers de mieux-être.",
@@ -301,78 +214,6 @@ const gallery: { src: string; label: Bi; caption: Bi }[] = [
   },
 ];
 
-const sponsors: { name: Bi; short: Bi; src: string; href: string }[] = [
-  {
-    name: {
-      en: "Government of Canada, Supporting Black Canadian Communities Initiative",
-      fr: "Gouvernement du Canada, Initiative Appuyer les communautés noires du Canada",
-    },
-    short: { en: "Government of Canada", fr: "Gouvernement du Canada" },
-    src: "/canada.png",
-    href: "https://www.canada.ca/en/employment-social-development/programs/supporting-black-canadian-communities-initiative.html",
-  },
-  {
-    name: { en: "Black Business Initiative", fr: "Black Business Initiative" },
-    short: { en: "BBI", fr: "BBI" },
-    src: "/bbi.png",
-    href: "https://bbi.ca/",
-  },
-  {
-    name: {
-      en: "Ontario Trillium Foundation",
-      fr: "Fondation Trillium de l'Ontario",
-    },
-    short: {
-      en: "Ontario Trillium Foundation",
-      fr: "Fondation Trillium de l'Ontario",
-    },
-    src: "/otf.png",
-    href: "https://otf.ca/",
-  },
-  {
-    name: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
-    short: { en: "Government of Ontario", fr: "Gouvernement de l'Ontario" },
-    src: "/ontario.png",
-    href: "https://www.ontario.ca/",
-  },
-];
-
-const heroSlides: { label: Bi; title: Record<Lang, string[]>; body: Bi }[] = [
-  {
-    label: { en: "About / The Foundation", fr: "À propos / La Fondation" },
-    title: {
-      en: ["Growth powered by Black immigrants."],
-      fr: ["La croissance portée par les immigrants noirs."],
-    },
-    body: {
-      en: "The Black Immigrants Community Foundation is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building.",
-      fr: "La Black Immigrants Community Foundation est un organisme sans but lucratif voué au soutien et à l'autonomisation des immigrants noirs par la défense des droits, les ressources et le renforcement communautaire.",
-    },
-  },
-  {
-    label: { en: "Our Mission", fr: "Notre mission" },
-    title: {
-      en: ["Practical resources.", "Real advocacy."],
-      fr: ["Des ressources concrètes.", "Une défense réelle."],
-    },
-    body: {
-      en: "BICF uplifts and empowers Black immigrants through practical resources, advocacy, and community engagement, breaking down systemic inequalities along the way.",
-      fr: "La BICF élève et outille les immigrants noirs par des ressources concrètes, la défense des droits et l'engagement communautaire, en démantelant les inégalités systémiques en cours de route.",
-    },
-  },
-  {
-    label: { en: "Our Vision", fr: "Notre vision" },
-    title: {
-      en: ["A world that sees,", "values, and celebrates."],
-      fr: ["Un monde qui voit,", "valorise et célèbre."],
-    },
-    body: {
-      en: "We envision a world where Black immigrants are fully accepted, valued, and celebrated, living free from discrimination and systemic barriers.",
-      fr: "Nous imaginons un monde où les immigrants noirs sont pleinement acceptés, valorisés et célébrés, vivant à l'abri de la discrimination et des barrières systémiques.",
-    },
-  },
-];
-
 const fullStory: Bi[] = [
   {
     en: "The Black Immigrants Community Foundation (BICF) is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building. We understand that Black immigrants often face complex and intersecting challenges that go beyond the typical struggles associated with immigration, such as racial discrimination, cultural alienation, language barriers, and limited access to critical services. These difficulties are frequently compounded by systemic inequalities that affect their ability to fully integrate and thrive in their new communities.",
@@ -400,22 +241,13 @@ const fullStory: Bi[] = [
   },
 ];
 
-type AboutProps = {
-  pageTitle?: string;
-  autoplayDelay?: number;
-};
-
 export default function About({
   pageTitle = "About | Black Immigrants Community Foundation",
-  autoplayDelay = 8000,
-}: AboutProps) {
+}: {
+  pageTitle?: string;
+}) {
   const { t, lang } = useLanguage();
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [storyExpanded, setStoryExpanded] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
-
-  useScrollRestoration("bicf-scroll");
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     document.title =
@@ -424,268 +256,143 @@ export default function About({
         : pageTitle;
   }, [pageTitle, lang]);
 
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      setActiveSlide((i) => (i + 1) % heroSlides.length);
-    }, autoplayDelay);
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [activeSlide, autoplayDelay]);
-
-  const goTo = (i: number) =>
-    setActiveSlide(
-      ((i % heroSlides.length) + heroSlides.length) % heroSlides.length,
-    );
-
-  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-      e.preventDefault();
-      const next =
-        e.key === "ArrowRight"
-          ? (activeSlide + 1) % heroSlides.length
-          : (activeSlide - 1 + heroSlides.length) % heroSlides.length;
-      setActiveSlide(next);
-      tabsRef.current[next]?.focus();
-    } else if (e.key === "Home") {
-      e.preventDefault();
-      setActiveSlide(0);
-      tabsRef.current[0]?.focus();
-    } else if (e.key === "End") {
-      e.preventDefault();
-      const last = heroSlides.length - 1;
-      setActiveSlide(last);
-      tabsRef.current[last]?.focus();
-    }
-  };
-
   return (
-    <main className="about">
-      <section className="about__hero" aria-labelledby="about-hero-title">
-        <div className="about__hero-media" aria-hidden="true">
-          {heroSlides.map((_, i) => (
-            <div
-              key={i}
-              className={`about__hero-shader about__hero-shader--p${i}${
-                i === activeSlide ? " about__hero-shader--active" : ""
-              }`}
-            />
-          ))}
-        </div>
-        <div className="about__hero-veil" aria-hidden="true" />
-
-        <div className="about__hero-panel">
-          <div className="about__hero-panel-inner">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSlide}
-                id={`hero-panel-${activeSlide}`}
-                role="tabpanel"
-                aria-labelledby={`hero-tab-${activeSlide}`}
-                className="about__hero-slide"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.5, ease }}
-              >
-                <span className="about__hero-label">
-                  {t(heroSlides[activeSlide].label)}
-                </span>
-                <h1 id="about-hero-title" className="about__hero-title">
-                  {t(heroSlides[activeSlide].title).map((line, i) => (
-                    <span key={i} className="about__hero-line">
-                      {line}
-                    </span>
-                  ))}
-                </h1>
-                <p className="about__hero-body">
-                  {t(heroSlides[activeSlide].body)}
-                </p>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="about__hero-controls">
-              <button
-                type="button"
-                className="about__hero-nav"
-                onClick={() => goTo(activeSlide - 1)}
-                aria-label={t({
-                  en: "Previous slide",
-                  fr: "Diapositive précédente",
-                })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M15 6L9 12L15 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              <div
-                className="about__hero-bars"
-                role="tablist"
-                aria-label={t({ en: "Hero slides", fr: "Diapositives" })}
-                onKeyDown={onTabsKeyDown}
-              >
-                {heroSlides.map((_, i) => (
-                  <button
-                    key={i}
-                    ref={(el) => {
-                      tabsRef.current[i] = el;
-                    }}
-                    type="button"
-                    role="tab"
-                    id={`hero-tab-${i}`}
-                    aria-controls={`hero-panel-${i}`}
-                    aria-selected={i === activeSlide}
-                    tabIndex={i === activeSlide ? 0 : -1}
-                    aria-label={t({
-                      en: `Go to slide ${i + 1}`,
-                      fr: `Aller à la diapositive ${i + 1}`,
-                    })}
-                    className={`about__hero-bar ${
-                      i === activeSlide ? "about__hero-bar--active" : ""
-                    }`}
-                    onClick={() => setActiveSlide(i)}
-                  />
-                ))}
-              </div>
-
-              <button
-                type="button"
-                className="about__hero-nav"
-                onClick={() => goTo(activeSlide + 1)}
-                aria-label={t({ en: "Next slide", fr: "Diapositive suivante" })}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M9 6L15 12L9 18"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="about__hero-meta">
-              <span>Ajax, Ontario</span>
-              <span aria-hidden="true">·</span>
-              <span>(905) 931 3776</span>
-            </div>
-          </div>
+    <main className="about" id="main">
+      {/* ====================================================== HERO dark */}
+      <section className="page-hero surface surface--dark" aria-labelledby="about-title">
+        <div className="page-hero__glow" aria-hidden="true" />
+        <div className="container page-hero__inner">
+          <Reveal as="span" className="kicker" y={12}>
+            {t({ en: "About / The Foundation", fr: "À propos / La Fondation" })}
+          </Reveal>
+          <Reveal
+            as="h1"
+            id="about-title"
+            className="h-display page-hero__title"
+            delay={0.05}
+          >
+            {t({ en: "Growth powered by ", fr: "La croissance portée par " })}
+            <span className="accent-word">
+              {t({ en: "Black immigrants.", fr: "les immigrants noirs." })}
+            </span>
+          </Reveal>
+          <Reveal as="p" className="lead page-hero__lead" delay={0.1}>
+            {t({
+              en: "The Black Immigrants Community Foundation is a nonprofit organization committed to supporting and empowering Black immigrants through advocacy, resources, and community building.",
+              fr: "La Black Immigrants Community Foundation est un organisme sans but lucratif voué au soutien et à l'autonomisation des immigrants noirs par la défense des droits, les ressources et le renforcement communautaire.",
+            })}
+          </Reveal>
+          <Reveal as="div" className="page-hero__actions" delay={0.16}>
+            <Link to="/services" className="btn btn--primary">
+              {t({ en: "Our Programs", fr: "Nos programmes" })}
+            </Link>
+            <Link to="/contact" className="btn btn--outline">
+              {t({ en: "Contact Us", fr: "Nous contacter" })}
+            </Link>
+          </Reveal>
         </div>
       </section>
 
-      <section className="about__story" aria-labelledby="about-story-title">
-        <div className="about__container">
-          <header className="about__section-head">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "About Us", fr: "À propos" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-story-title"
-            >
-              {t({
-                en: "A foundation built around the realities of Black immigrant life.",
-                fr: "Une fondation conçue autour des réalités de la vie des immigrants noirs.",
-              })}
+      {/* ===================================================== STORY light */}
+      <section className="story surface surface--light sheet" aria-labelledby="story-title">
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "About Us", fr: "À propos" })}
+              </Reveal>
+              <Reveal as="h2" id="story-title" className="h2" delay={0.05}>
+                {t({
+                  en: "A foundation built around the realities of Black immigrant life.",
+                  fr: "Une fondation conçue autour des réalités de la vie des immigrants noirs.",
+                })}
+              </Reveal>
+            </div>
+            <Reveal as="div" className="section-head__aside" delay={0.1}>
+              <p className="body">
+                {t({
+                  en: "Practical resources. Real advocacy. A community that holds.",
+                  fr: "Des ressources concrètes. Une défense réelle. Une communauté solide.",
+                })}
+              </p>
             </Reveal>
           </header>
 
-          <div className="about__story-body">
-            <Reveal as="p" delay={0}>
+          <div className="story__body">
+            <Reveal as="p" className="story__lead">
               {t({
                 en: "The Black Immigrants Community Foundation (BICF) is a nonprofit organization committed to empowering Black immigrants through advocacy, resources, and community building. We understand the intersecting challenges Black immigrants face from racial discrimination and cultural alienation to systemic barriers that hinder integration and success.",
                 fr: "La Black Immigrants Community Foundation (BICF) est un organisme sans but lucratif voué à l'autonomisation des immigrants noirs par la défense des droits, les ressources et le renforcement communautaire. Nous comprenons les défis imbriqués auxquels les immigrants noirs font face, de la discrimination raciale et de l'aliénation culturelle aux barrières systémiques qui freinent l'intégration et la réussite.",
               })}
             </Reveal>
 
-            {storyExpanded && (
-              <>
-                <Reveal as="p" delay={0.1}>
-                  {t({
-                    en: "At BICF, we provide culturally responsive programs and support to ensure Black immigrants not only survive but thrive in their new communities. Our work is rooted in dignity, equity, and the belief that collective growth comes when everyone has the opportunity to succeed.",
-                    fr: "À la BICF, nous offrons des programmes et un soutien adaptés à la culture pour que les immigrants noirs ne se contentent pas de survivre, mais s'épanouissent dans leurs nouvelles communautés. Notre travail est ancré dans la dignité, l'équité et la conviction que la croissance collective survient lorsque chacun a la possibilité de réussir.",
-                  })}
-                </Reveal>
-                {fullStory.map((para, i) => (
-                  <Reveal as="p" key={i} delay={0.15 + i * 0.05}>
-                    {t(para)}
-                  </Reveal>
-                ))}
-              </>
-            )}
+            <AnimatePresence initial={false}>
+              {expanded && (
+                <motion.div
+                  key="more"
+                  className="story__more"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.45, ease: EASE }}
+                >
+                  <p className="body">
+                    {t({
+                      en: "At BICF, we provide culturally responsive programs and support to ensure Black immigrants not only survive but thrive in their new communities. Our work is rooted in dignity, equity, and the belief that collective growth comes when everyone has the opportunity to succeed.",
+                      fr: "À la BICF, nous offrons des programmes et un soutien adaptés à la culture pour que les immigrants noirs ne se contentent pas de survivre, mais s'épanouissent dans leurs nouvelles communautés. Notre travail est ancré dans la dignité, l'équité et la conviction que la croissance collective survient lorsque chacun a la possibilité de réussir.",
+                    })}
+                  </p>
+                  {fullStory.map((para, i) => (
+                    <p className="body" key={i}>
+                      {t(para)}
+                    </p>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div className="about__story-button-wrapper">
-              <button
-                type="button"
-                className="about__story-btn"
-                aria-expanded={storyExpanded}
-                onClick={() => setStoryExpanded(!storyExpanded)}
-              >
-                {storyExpanded
-                  ? t({ en: "Show Less", fr: "Afficher moins" })
-                  : t({ en: "Learn More", fr: "En savoir plus" })}
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn btn--outline story__toggle"
+              aria-expanded={expanded}
+              onClick={() => setExpanded((v) => !v)}
+            >
+              {expanded
+                ? t({ en: "Show Less", fr: "Afficher moins" })
+                : t({ en: "Read Our Full Story", fr: "Lire notre histoire complète" })}
+            </button>
           </div>
         </div>
       </section>
 
-      <section className="about__pillars" aria-labelledby="about-pillars-title">
-        <div className="about__pillars-aurora" aria-hidden="true" />
-        <div className="about__container">
-          <header className="about__section-head">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "The Frame", fr: "Le cadre" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-pillars-title"
-            >
-              {t({
-                en: "Purpose, mission, and vision.",
-                fr: "Raison d'être, mission et vision.",
-              })}
-            </Reveal>
+      {/* ==================================================== PILLARS dark */}
+      <section className="pillars surface surface--dark" aria-labelledby="pillars-title">
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "The Frame", fr: "Le cadre" })}
+              </Reveal>
+              <Reveal as="h2" id="pillars-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Purpose, mission, and vision.",
+                  fr: "Raison d'être, mission et vision.",
+                })}
+              </Reveal>
+            </div>
           </header>
 
-          <div className="about__pillars-stack">
+          <div className="pillars__stack">
             {pillars.map((p, i) => (
-              <motion.article
+              <Reveal
+                as="article"
+                className="pillar"
                 key={p.label.en}
-                className="about__pillar"
                 data-align={i % 2 === 0 ? "left" : "right"}
-                initial={{ opacity: 0, y: 60 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-12%" }}
-                transition={{ duration: 0.95, ease, delay: i * 0.06 }}
+                delay={0.04}
+                y={30}
               >
-                <div className="about__pillar-media">
+                <figure className="pillar__media">
                   <img
                     src={p.image}
                     alt={`${t(p.label)}, ${t(p.tag)}`}
@@ -694,241 +401,133 @@ export default function About({
                     loading="lazy"
                     decoding="async"
                   />
-                  <span className="about__pillar-badge">
-                    <span className="about__pillar-badge-num">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="about__pillar-badge-text">
-                      {t(p.tag)}
-                    </span>
+                  <span className="pillar__badge">
+                    <span className="pillar__badge-text">{t(p.tag)}</span>
                   </span>
-                </div>
+                </figure>
 
-                <div className="about__pillar-content">
-                  <span className="about__pillar-eyebrow">
-                    <span className="about__pillar-dot" aria-hidden="true" />
+                <div className="pillar__content">
+                  <span className="kicker">
                     {t({ en: "BICF Foundation", fr: "Fondation BICF" })}
                   </span>
-                  <h3 className="about__pillar-label">{t(p.label)}</h3>
-                  <p className="about__pillar-body">{t(p.body)}</p>
-                  <span className="about__pillar-arrow" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-                      <path
-                        d="M5 12h14M13 5l7 7-7 7"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
+                  <h3 className="h2 pillar__label">{t(p.label)}</h3>
+                  <p className="lead pillar__body">{t(p.body)}</p>
                 </div>
-              </motion.article>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="about__values" aria-labelledby="about-values-title">
-        <div className="about__container">
-          <header className="about__section-head">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "Core Values", fr: "Valeurs fondamentales" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-values-title"
-            >
-              {t({
-                en: "Eight commitments that shape our work.",
-                fr: "Huit engagements qui façonnent notre travail.",
-              })}
-            </Reveal>
+      {/* ==================================================== VALUES light */}
+      <section className="values surface surface--light sheet" aria-labelledby="values-title">
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "Core Values", fr: "Valeurs fondamentales" })}
+              </Reveal>
+              <Reveal as="h2" id="values-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Eight commitments that shape our work.",
+                  fr: "Huit engagements qui façonnent notre travail.",
+                })}
+              </Reveal>
+            </div>
           </header>
 
-          <ul className="about__values-grid">
+          <ul className="values__grid">
             {values.map((v, i) => (
-              <motion.li
-                key={v.title.en}
-                className="about__value"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8%" }}
-                transition={{ duration: 0.75, ease, delay: (i % 2) * 0.06 }}
-              >
-                <span className="about__value-num">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="about__value-title">{t(v.title)}</h3>
-                <p className="about__value-body">{t(v.body)}</p>
-              </motion.li>
+              <Reveal as="li" className="value" key={v.title.en} delay={(i % 2) * 0.06}>
+                <h3 className="h3 value__title">{t(v.title)}</h3>
+                <p className="value__body">{t(v.body)}</p>
+              </Reveal>
             ))}
           </ul>
         </div>
       </section>
 
-      <section
-        className="about__services"
-        aria-labelledby="about-services-title"
-      >
-        <div className="about__container">
-          <header className="about__section-head">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "What We Do", fr: "Ce que nous faisons" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-services-title"
-            >
-              {t({
-                en: "Programs and services for the diverse needs of Black immigrants.",
-                fr: "Des programmes et services pour les besoins variés des immigrants noirs.",
-              })}
+      {/* ================================================== SERVICES tint */}
+      <section className="what surface surface--tint" aria-labelledby="what-title">
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "What We Do", fr: "Ce que nous faisons" })}
+              </Reveal>
+              <Reveal as="h2" id="what-title" className="h2" delay={0.05}>
+                {t({
+                  en: "Programs and services for the diverse needs of Black immigrants.",
+                  fr: "Des programmes et services pour les besoins variés des immigrants noirs.",
+                })}
+              </Reveal>
+            </div>
+            <Reveal as="div" className="section-head__aside" delay={0.1}>
+              <p className="body">
+                {t({
+                  en: "Each service is tailored to promote empowerment, inclusion, and self sufficiency.",
+                  fr: "Chaque service est conçu pour favoriser l'autonomisation, l'inclusion et l'autonomie.",
+                })}
+              </p>
+              <Link to="/services" className="link-arrow">
+                {t({ en: "See all 13 programs", fr: "Voir les 13 programmes" })}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
             </Reveal>
           </header>
 
-          <ol className="about__services-list">
+          <ol className="what__list">
             {services.map((s, i) => (
-              <motion.li
-                key={s.title.en}
-                className="about__service"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.8, ease, delay: i * 0.05 }}
-              >
-                <span className="about__service-num">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="about__service-title">{t(s.title)}</h3>
-                <p className="about__service-body">{t(s.body)}</p>
-              </motion.li>
+              <Reveal as="li" className="what__item" key={s.title.en} delay={(i % 3) * 0.05}>
+                <div>
+                  <h3 className="h3 what__title">{t(s.title)}</h3>
+                  <p className="body what__body">{t(s.body)}</p>
+                </div>
+              </Reveal>
             ))}
           </ol>
-
-          <Reveal as="p" className="about__services-note" delay={0.2}>
-            {t({
-              en: "Each service is tailored to promote empowerment, inclusion, and self sufficiency.",
-              fr: "Chaque service est conçu pour favoriser l'autonomisation, l'inclusion et l'autonomie.",
-            })}
-          </Reveal>
         </div>
       </section>
 
-      <section className="about__gallery" aria-labelledby="about-gallery-title">
-        <div className="about__container">
-          <header className="about__section-head">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "Moments", fr: "Moments" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-gallery-title"
-            >
-              {t({ en: "In the community.", fr: "Dans la communauté." })}
-            </Reveal>
+      {/* =================================================== GALLERY dark */}
+      <section className="gallery surface surface--dark" aria-labelledby="gallery-title">
+        <div className="container">
+          <header className="section-head">
+            <div>
+              <Reveal as="span" className="kicker">
+                {t({ en: "Moments", fr: "Moments" })}
+              </Reveal>
+              <Reveal as="h2" id="gallery-title" className="h2" delay={0.05}>
+                {t({ en: "In the community.", fr: "Dans la communauté." })}
+              </Reveal>
+            </div>
           </header>
 
-          <div className="about__gallery-grid">
+          <ul className="gallery__grid">
             {gallery.map((item, i) => (
-              <motion.figure
-                key={item.src}
-                className={`about__gallery-item about__gallery-item--${i + 1}`}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.9, ease, delay: i * 0.08 }}
-                tabIndex={0}
-              >
-                <img
-                  src={item.src}
-                  alt={t(item.label)}
-                  width={1200}
-                  height={1500}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span className="about__gallery-index" aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                  <span>/{String(gallery.length).padStart(2, "0")}</span>
-                </span>
-                <figcaption className="about__gallery-caption">
-                  <span className="about__gallery-label">{t(item.label)}</span>
-                  <span className="about__gallery-text">
-                    {t(item.caption)}
-                  </span>
-                </figcaption>
-              </motion.figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="about__sponsors"
-        aria-labelledby="about-sponsors-title"
-      >
-        <div className="about__container">
-          <header className="about__section-head about__section-head--center">
-            <Reveal as="span" className="about__kicker">
-              {t({ en: "Supported By", fr: "Soutenu par" })}
-            </Reveal>
-            <Reveal
-              as="h2"
-              className="about__section-title"
-              delay={0.08}
-              id="about-sponsors-title"
-            >
-              {t({
-                en: "Proudly funded by leading Canadian institutions and community partners.",
-                fr: "Fièrement financé par d'éminentes institutions canadiennes et des partenaires communautaires.",
-              })}
-            </Reveal>
-          </header>
-
-          <Reveal as="p" className="about__sponsors-intro" delay={0.16}>
-            {t({
-              en: "BICF's programs are sustained by a network of public funders and community foundations who share our commitment to long term equity for Black immigrants in Canada. Their continued investment makes our coordinated, no cost services possible, and turns one organization's intent into a community wide capability.",
-              fr: "Les programmes de la BICF sont soutenus par un réseau de bailleurs de fonds publics et de fondations communautaires qui partagent notre engagement envers une équité durable pour les immigrants noirs au Canada. Leur investissement continu rend possibles nos services coordonnés et gratuits, et transforme l'intention d'un seul organisme en une capacité à l'échelle de toute la communauté.",
-            })}
-          </Reveal>
-
-          <ul className="about__sponsors-grid">
-            {sponsors.map((s, i) => (
-              <motion.li
-                key={s.name.en}
-                className="about__sponsor"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-8%" }}
-                transition={{ duration: 0.7, ease, delay: i * 0.08 }}
-              >
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="about__sponsor-link"
-                  aria-label={t(s.name)}
-                >
+              <Reveal as="li" key={item.src} delay={(i % 3) * 0.07}>
+                <figure className="shot">
                   <img
-                    src={s.src}
-                    alt={t(s.name)}
+                    src={item.src}
+                    alt={t(item.label)}
+                    width={1200}
+                    height={1500}
                     loading="lazy"
                     decoding="async"
                   />
-                </a>
-                <span className="about__sponsor-name">{t(s.short)}</span>
-              </motion.li>
+                  <figcaption className="shot__cap">
+                    <span className="shot__label">{t(item.label)}</span>
+                    <span className="shot__text">{t(item.caption)}</span>
+                  </figcaption>
+                </figure>
+              </Reveal>
             ))}
           </ul>
         </div>
       </section>
+
     </main>
   );
 }

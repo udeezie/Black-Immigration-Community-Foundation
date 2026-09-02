@@ -1,3 +1,6 @@
+/* Application entry point. Mounts React and wraps the app in the
+      language provider so every component can call `t()` for EN/FR copy. */
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -15,8 +18,6 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 )
 
-// Remove the initial page loader once the app has mounted, keeping it on
-// screen for a minimum time so it never flashes.
 const MIN_VISIBLE_MS = 1400
 const hideInitialLoader = () => {
   const el = document.getElementById('initial-loader')

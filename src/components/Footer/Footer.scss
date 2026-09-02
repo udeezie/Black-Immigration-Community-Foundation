@@ -1,9 +1,10 @@
+/* Footer styles. */
+
 .footer {
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   overflow: hidden;
-  border-top: 1px solid var(--color-border);
 }
 
 .footer__label {
@@ -17,8 +18,7 @@
 }
 
 .footer__body {
-  padding: 72px 0 64px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 72px 0 56px;
 }
 
 .footer__body-inner {
@@ -331,7 +331,6 @@
 
 .footer__bar {
   padding: 18px 0;
-  border-bottom: 1px solid var(--color-border);
 }
 
 .footer__bar-inner {
@@ -364,18 +363,14 @@
 
 .footer__legal {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 
-  a {
+  span {
     font-size: 11px;
     color: var(--color-muted);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: var(--color-text);
-    }
   }
 }
 
@@ -417,9 +412,8 @@
 }
 
 .footer__credit {
-  padding: 16px 0 24px;
+  padding: 8px 0 28px;
   text-align: center;
-  border-top: 1px solid var(--color-border);
 
   span {
     font-size: 11px;
@@ -430,7 +424,7 @@
 }
 
 .footer__credit-link {
-  color: var(--color-text);
+  color: var(--color-muted);
   transition: color 0.2s ease;
 
   &:hover {

@@ -1,3 +1,11 @@
+/* Site header.
+   
+      Two navigations share one set of links: an inline row at 1100px and up, and
+      a fullscreen overlay below that. The hamburger is hidden at the desktop
+      breakpoint, so a matchMedia listener force-closes the overlay when the
+      viewport crosses it, otherwise a menu opened on mobile would be stranded
+      open with no way to close it. */
+
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
@@ -9,20 +17,16 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const mainLinks = [
   { label: { en: "Home", fr: "Accueil" }, to: "/", end: true },
   { label: { en: "About", fr: "À Propos" }, to: "/about", end: false },
-  { label: { en: "Services", fr: "Services" }, to: "/services", end: false },
+  { label: { en: "Programs", fr: "Programmes" }, to: "/services", end: false },
   { label: { en: "Research", fr: "Recherche" }, to: "/research", end: false },
   { label: { en: "Contact", fr: "Contact" }, to: "/contact", end: false },
 ];
 
-const quickLinks = [
-  { label: { en: "Volunteer", fr: "Bénévolat" }, to: "/volunteer" },
-  { label: { en: "Careers", fr: "Carrières" }, to: "/careers" },
-];
-
+/* Marks, not links. BICF has no public profiles yet, so these render as
+   <span> with an aria-label rather than anchors to nowhere. */
 const socialLinks = [
   {
     name: "Instagram",
-    href: "#",
     icon: (
       <svg
         viewBox="0 0 24 24"
@@ -42,7 +46,6 @@ const socialLinks = [
   },
   {
     name: "Facebook",
-    href: "#",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
@@ -51,7 +54,6 @@ const socialLinks = [
   },
   {
     name: "X",
-    href: "#",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -60,7 +62,6 @@ const socialLinks = [
   },
   {
     name: "LinkedIn",
-    href: "#",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
@@ -72,7 +73,7 @@ const socialLinks = [
 ];
 
 export default function Navbar() {
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -106,6 +107,23 @@ export default function Navbar() {
     };
   }, [open]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1100px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   const close = () => setOpen(false);
   const toggleMenu = () => setOpen((v) => !v);
 
@@ -119,7 +137,12 @@ export default function Navbar() {
         ].join(" ")}
       >
         <div className={styles.headerInner}>
-          <NavLink to="/" className={styles.logo} onClick={close} aria-label="Black Immigrants Community Foundation, Home">
+          <NavLink
+            to="/"
+            className={styles.logo}
+            onClick={close}
+            aria-label="Black Immigrants Community Foundation, Home"
+          >
             <svg
               className={styles.logoMark}
               viewBox="0 0 32 32"
@@ -143,35 +166,108 @@ export default function Navbar() {
             </span>
           </NavLink>
 
-          <label
-            className={styles.hamburger}
-            aria-label={
-              open
-                ? t({ en: "Close menu", fr: "Fermer le menu" })
-                : t({ en: "Open menu", fr: "Ouvrir le menu" })
-            }
+          <nav
+            className={styles.desktopNav}
+            aria-label={t({
+              en: "Main navigation",
+              fr: "Navigation principale",
+            })}
           >
-            <input type="checkbox" checked={open} onChange={toggleMenu} />
-            <svg viewBox="0 0 32 32">
-              <path
-                className={styles.lineTopBottom}
-                d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+            {mainLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                end={link.end}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
+                }
+              >
+                {t(link.label)}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className={styles.headerActions}>
+            <a className={styles.headerPhone} href="tel:+19059313776">
+              (905) 931 3776
+            </a>
+
+            <div
+              className={styles.headerLang}
+              role="group"
+              aria-label={t({
+                en: "Select language",
+                fr: "Choisir la langue",
+              })}
+            >
+              <button
+                type="button"
+                className={`${styles.headerLangBtn} ${lang === "en" ? styles.headerLangBtnActive : ""}`}
+                onClick={() => setLang("en")}
+                aria-pressed={lang === "en"}
+              >
+                EN
+              </button>
+              <span className={styles.headerLangSep} aria-hidden="true">
+                /
+              </span>
+              <button
+                type="button"
+                className={`${styles.headerLangBtn} ${lang === "fr" ? styles.headerLangBtnActive : ""}`}
+                onClick={() => setLang("fr")}
+                aria-pressed={lang === "fr"}
+              >
+                FR
+              </button>
+            </div>
+
+            <NavLink to="/contact" className={styles.headerCta} onClick={close}>
+              {t({ en: "Get Support", fr: "Obtenir du soutien" })}
+            </NavLink>
+
+            <label
+              className={styles.hamburger}
+              aria-label={
+                open
+                  ? t({ en: "Close menu", fr: "Fermer le menu" })
+                  : t({ en: "Open menu", fr: "Ouvrir le menu" })
+              }
+            >
+              <input
+                type="checkbox"
+                checked={open}
+                onChange={toggleMenu}
+                aria-expanded={open}
+                aria-controls="site-menu"
               />
-              <path className={styles.line} d="M7 16 27 16" />
-            </svg>
-          </label>
+              <svg viewBox="0 0 32 32">
+                <path
+                  className={styles.lineTopBottom}
+                  d="M27 10 13 10C10.8 10 9 8.2 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"
+                />
+                <path className={styles.line} d="M7 16 27 16" />
+              </svg>
+            </label>
+          </div>
         </div>
       </header>
 
       <div
+        id="site-menu"
         className={`${styles.overlay} ${open ? styles.overlayOpen : ""}`}
         aria-hidden={!open}
       >
         {open && (
           <div className={styles.overlayGrid}>
             <div className={styles.cell}>
-              <span className={styles.label}>{t({ en: "Main", fr: "Menu" })}</span>
-              <nav className={styles.mainNav}>
+              <span className={styles.label}>{t({ en: "Menu", fr: "Menu" })}</span>
+              <nav
+                className={styles.mainNav}
+                aria-label={t({
+                  en: "Main navigation",
+                  fr: "Navigation principale",
+                })}
+              >
                 {mainLinks.map((link, i) => (
                   <NavLink
                     key={link.to}
@@ -191,25 +287,20 @@ export default function Navbar() {
 
             <div className={styles.cell}>
               <span className={styles.label}>
-                {t({ en: "Quick Links", fr: "Liens Rapides" })}
+                {t({ en: "Get Support", fr: "Obtenir du soutien" })}
               </span>
-              <nav className={styles.quickNav}>
-                {quickLinks.map((link, i) => (
-                  <NavLink
-                    key={link.to}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      `${styles.quickLink} ${isActive ? styles.quickLinkActive : ""}`
-                    }
-                    onClick={close}
-                    style={{
-                      animationDelay: `${(mainLinks.length + i) * 70}ms`,
-                    }}
-                  >
-                    {t(link.label)}
-                  </NavLink>
-                ))}
-              </nav>
+              <p className={styles.supportNote}>
+                {t({
+                  en: "Free of charge. No proof of status required. Every conversation is confidential.",
+                  fr: "Sans frais. Aucune preuve de statut exigée. Chaque conversation est confidentielle.",
+                })}
+              </p>
+              <a className={styles.supportPhone} href="tel:+19059313776">
+                (905) 931 3776
+              </a>
+              <a className={styles.supportMail} href="mailto:secretary@bicf.ca">
+                secretary@bicf.ca
+              </a>
             </div>
 
             <div className={styles.cell}>
@@ -217,13 +308,35 @@ export default function Navbar() {
                 {t({ en: "Get In Touch", fr: "Nous Joindre" })}
               </span>
               <div className={styles.ctaGroup}>
-                <NavLink
-                  to="/contact"
-                  className={styles.ctaFilled}
-                  onClick={close}
-                >
+                <NavLink to="/contact" className={styles.ctaFilled} onClick={close}>
                   {t({ en: "Contact Us", fr: "Nous Contacter" })}
                 </NavLink>
+              </div>
+
+              <span className={`${styles.label} ${styles.labelSpaced}`}>
+                {t({ en: "Language", fr: "Langue" })}
+              </span>
+              <div
+                className={styles.langSwitch}
+                role="group"
+                aria-label={t({ en: "Select language", fr: "Choisir la langue" })}
+              >
+                <button
+                  type="button"
+                  className={`${styles.langBtn} ${lang === "en" ? styles.langBtnActive : ""}`}
+                  onClick={() => setLang("en")}
+                  aria-pressed={lang === "en"}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.langBtn} ${lang === "fr" ? styles.langBtnActive : ""}`}
+                  onClick={() => setLang("fr")}
+                  aria-pressed={lang === "fr"}
+                >
+                  Français
+                </button>
               </div>
             </div>
 
@@ -233,16 +346,14 @@ export default function Navbar() {
               </span>
               <div className={styles.socialRow}>
                 {socialLinks.map((s) => (
-                  <a
+                  <span
                     key={s.name}
-                    href={s.href}
-                    aria-label={s.name}
                     className={styles.socialIcon}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    aria-label={s.name}
+                    role="img"
                   >
                     {s.icon}
-                  </a>
+                  </span>
                 ))}
               </div>
             </div>
