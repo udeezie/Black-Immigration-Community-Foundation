@@ -1,10 +1,10 @@
 /* Site header.
-   
-      Two navigations share one set of links: an inline row at 1100px and up, and
-      a fullscreen overlay below that. The hamburger is hidden at the desktop
-      breakpoint, so a matchMedia listener force-closes the overlay when the
-      viewport crosses it, otherwise a menu opened on mobile would be stranded
-      open with no way to close it. */
+
+   Two navigations share one set of links: an inline row at 1100px and up, and
+   a fullscreen overlay below that. The hamburger is hidden at the desktop
+   breakpoint, so a matchMedia listener force-closes the overlay when the
+   viewport crosses it, otherwise a menu opened on mobile would be stranded
+   open with no way to close it. */
 
 import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";

@@ -1,8 +1,8 @@
 /* Bilingual EN/FR support.
-   
-      `t({en, fr})` returns the string for the active language. The choice is
-      persisted to localStorage, falls back to the browser locale on first visit,
-      and is mirrored onto <html lang> so screen readers use the right voice. */
+
+   `t({en, fr})` returns the string for the active language. The choice is
+   persisted to localStorage, falls back to the browser locale on first visit,
+   and is mirrored onto <html lang> so screen readers use the right voice. */
 
 import {
   createContext,

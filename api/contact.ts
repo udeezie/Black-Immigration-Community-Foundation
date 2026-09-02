@@ -1,11 +1,11 @@
 /* Serverless handler for the contact form (Vercel).
-   
-      Validates the payload, drops anything that fills the honeypot, then sends
-      two mails through nodemailer: a notification to the office and a branded
-      auto-reply to the sender.
-   
-      All credentials come from environment variables set in the Vercel
-      dashboard. Never commit real values. */
+
+   Validates the payload, drops anything that fills the honeypot, then sends
+   two mails through nodemailer: a notification to the office and a branded
+   auto-reply to the sender.
+
+   All credentials come from environment variables set in the Vercel
+   dashboard. Never commit real values. */
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import nodemailer from "nodemailer";

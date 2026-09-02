@@ -1,14 +1,14 @@
 /* Home page layout.
-   
-      Layout only. Colour comes from the surface tokens, so each block works on
-      whichever surface it is dropped onto. */
+
+   Layout only. Colour comes from the surface tokens, so each block works on
+   whichever surface it is dropped onto. */
 
 .home {
   overflow-x: clip;
 }
 
-/* Hero ====================================================================== */
-/* Full bleed photograph with the copy over its left side. The scrim is
+/* Hero
+   Full bleed photograph with the copy over its left side. The scrim is
    directional so the right of the frame stays readable as an image, and
    object-position leans low and centre because that is where the family
    sits in the source photo. */
@@ -110,7 +110,7 @@
   }
 }
 
-/* Story  who BICF is, with mission and vision beneath ======================= */
+/* Story  who BICF is, with mission and vision beneath */
 .story {
   padding-top: calc(var(--section-y) + var(--r-sheet));
   padding-bottom: var(--section-y);
@@ -181,7 +181,7 @@
   }
 }
 
-/* Funders  one institutional strip, not floating cards ====================== */
+/* Funders  one institutional strip, not floating cards */
 .backing {
   padding-block: var(--section-y-sm);
 
@@ -292,7 +292,7 @@
   }
 }
 
-/* Programs  photo led cards, second row runs wider ========================== */
+/* Programs  photo led cards, second row runs wider */
 .programs {
   padding-block: var(--section-y);
 
@@ -409,7 +409,7 @@
   }
 }
 
-/* Feature  two alternating photo and copy rows ============================== */
+/* Feature  two alternating photo and copy rows */
 .feature {
   padding-top: calc(var(--section-y) + var(--r-sheet));
   padding-bottom: var(--section-y);
@@ -464,7 +464,7 @@
   }
 }
 
-/* Voices  testimonials ====================================================== */
+/* Voices  testimonials */
 .voices {
   padding-block: var(--section-y);
 
@@ -554,7 +554,7 @@
   }
 }
 
-/* Get involved  sticky pitch beside a hairline index ======================== */
+/* Get involved  sticky pitch beside a hairline index */
 .involve {
   padding-block: var(--section-y);
 

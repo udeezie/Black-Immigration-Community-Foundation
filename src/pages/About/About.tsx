@@ -258,7 +258,7 @@ export default function About({
 
   return (
     <main className="about" id="main">
-      {/* ====================================================== HERO dark */}
+      {/* Hero, dark surface */}
       <section className="page-hero surface surface--dark" aria-labelledby="about-title">
         <div className="page-hero__glow" aria-hidden="true" />
         <div className="container page-hero__inner">
@@ -293,7 +293,7 @@ export default function About({
         </div>
       </section>
 
-      {/* ===================================================== STORY light */}
+      {/* Story, light surface */}
       <section className="story surface surface--light sheet" aria-labelledby="story-title">
         <div className="container">
           <header className="section-head">
@@ -365,7 +365,7 @@ export default function About({
         </div>
       </section>
 
-      {/* ==================================================== PILLARS dark */}
+      {/* Pillars, dark surface */}
       <section className="pillars surface surface--dark" aria-labelledby="pillars-title">
         <div className="container">
           <header className="section-head">
@@ -419,7 +419,7 @@ export default function About({
         </div>
       </section>
 
-      {/* ==================================================== VALUES light */}
+      {/* Values, light surface */}
       <section className="values surface surface--light sheet" aria-labelledby="values-title">
         <div className="container">
           <header className="section-head">
@@ -447,7 +447,7 @@ export default function About({
         </div>
       </section>
 
-      {/* ================================================== SERVICES tint */}
+      {/* Services, tint surface */}
       <section className="what surface surface--tint" aria-labelledby="what-title">
         <div className="container">
           <header className="section-head">
@@ -491,7 +491,7 @@ export default function About({
         </div>
       </section>
 
-      {/* =================================================== GALLERY dark */}
+      {/* Gallery, dark surface */}
       <section className="gallery surface surface--dark" aria-labelledby="gallery-title">
         <div className="container">
           <header className="section-head">

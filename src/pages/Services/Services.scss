@@ -4,7 +4,7 @@
   overflow-x: clip;
 }
 
-/* Who we serve ============================================================== */
+/* Who we serve */
 .who {
   padding-top: calc(var(--section-y) + var(--r-sheet));
   padding-bottom: var(--section-y);
@@ -57,8 +57,8 @@
   }
 }
 
-/* Catalogue ================================================================= */
-/* Filter chips narrow thirteen programs to four or five cards, and the
+/* Catalogue
+   Filter chips narrow thirteen programs to four or five cards, and the
    long detail stays folded until asked for. */
 .catalog {
   padding-block: var(--section-y);
@@ -327,7 +327,7 @@
   }
 }
 
-/* How it works  a connected track, not three loose cards ==================== */
+/* How it works  a connected track, not three loose cards */
 .steps {
   padding-top: calc(var(--section-y) + var(--r-sheet));
   padding-bottom: var(--section-y);

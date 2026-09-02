@@ -4,7 +4,7 @@
   overflow-x: clip;
 }
 
-/* Form section ============================================================== */
+/* Form section */
 .cform {
   padding-block: var(--section-y);
 
@@ -76,8 +76,8 @@
   }
 }
 
-/* Form controls ============================================================= */
-/* .field--bad is applied by the page once a field has been touched and
+/* Form controls
+   .field--bad is applied by the page once a field has been touched and
    failed validation. */
 .field {
   display: flex;
@@ -302,7 +302,7 @@
   }
 }
 
-/* Success state  replaces the form once it has been sent ==================== */
+/* Success state  replaces the form once it has been sent */
 .done {
   display: flex;
   flex-direction: column;
@@ -332,7 +332,7 @@
   }
 }
 
-/* Visit  address, phone, email and the map ================================== */
+/* Visit  address, phone, email and the map */
 .visit {
   padding-block: var(--section-y);
 

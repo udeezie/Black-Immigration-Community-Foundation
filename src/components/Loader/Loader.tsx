@@ -1,7 +1,7 @@
 /* First-paint loading overlay.
-   
-      Shows briefly on initial load, then unmounts. Its background is pinned to
-      the dark token directly so it cannot flash white on a light page. */
+
+   Shows briefly on initial load, then unmounts. Its background is pinned to
+   the dark token directly so it cannot flash white on a light page. */
 
 import styles from "./Loader.module.scss";
 

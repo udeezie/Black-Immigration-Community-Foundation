@@ -1,8 +1,8 @@
 /* Header styles, CSS-module scoped.
-   
-      The markup predates the design system, so the token names it expects
-      (--color-bg, --color-text...) are mapped from the global tokens in the
-      scope block at the foot of this file. */
+
+   The markup predates the design system, so the token names it expects
+   (--color-bg, --color-text...) are mapped from the global tokens in the
+   scope block at the foot of this file. */
 
 $ease: cubic-bezier(0.4, 0, 0.2, 1);
 $dur: 0.35s;

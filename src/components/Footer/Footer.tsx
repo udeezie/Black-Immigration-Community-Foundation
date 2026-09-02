@@ -1,7 +1,7 @@
 /* Site footer. Contact details, navigation, language switch.
-   
-      Social icons are marks rather than links: BICF has no public profiles yet,
-      so they must not be clickable. */
+
+   Social icons are marks rather than links: BICF has no public profiles yet,
+   so they must not be clickable. */
 
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail } from 'lucide-react'

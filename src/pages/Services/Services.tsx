@@ -1,8 +1,8 @@
 /* Programs page.
-   
-      Thirteen programs presented as a filterable catalogue rather than one long
-      list: the chips narrow the grid to a single area of focus, and each card
-      keeps its long detail folded away until asked for. */
+
+   Thirteen programs presented as a filterable catalogue rather than one long
+   list: the chips narrow the grid to a single area of focus, and each card
+   keeps its long detail folded away until asked for. */
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -402,7 +402,7 @@ export default function Services({
 
   return (
     <main className="services" id="main">
-      {/* ============================================ HERO */}
+      {/* Hero */}
       <section className="page-hero surface surface--dark" aria-labelledby="svc-title">
         <div className="page-hero__glow" aria-hidden="true" />
         <div className="container page-hero__inner">
@@ -440,7 +440,7 @@ export default function Services({
         </div>
       </section>
 
-      {/* ============================================ WHO WE SERVE */}
+      {/* Who we serve */}
       <section className="who surface surface--light sheet" aria-labelledby="who-title">
         <div className="container">
           <div className="who__grid">
@@ -471,7 +471,7 @@ export default function Services({
         </div>
       </section>
 
-      {/* ============================================ CATALOG */}
+      {/* Catalog */}
       <section
         className="catalog surface surface--tint"
         id="programs"
@@ -614,7 +614,7 @@ export default function Services({
         </div>
       </section>
 
-      {/* ============================================ HOW IT WORKS */}
+      {/* How it works */}
       <section
         className="steps surface surface--dark sheet"
         aria-labelledby="steps-title"

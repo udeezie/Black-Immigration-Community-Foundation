@@ -1,12 +1,12 @@
 /* Shared scroll-into-view animation.
-   
-      Wraps children in a motion element that fades and lifts once, the first
-      time it enters the viewport. `as` picks the element so the markup stays
-      semantic. Honours prefers-reduced-motion by rendering a plain element.
-   
-      Note: it forwards only the props listed in its type. Adding ARIA
-      attributes (role, aria-label) to a <Reveal> will not compile; put them on a
-      plain element inside it instead. */
+
+   Wraps children in a motion element that fades and lifts once, the first
+   time it enters the viewport. `as` picks the element so the markup stays
+   semantic. Honours prefers-reduced-motion by rendering a plain element.
+
+   Note: it forwards only the props listed in its type. Adding ARIA
+   attributes (role, aria-label) to a <Reveal> will not compile; put them on a
+   plain element inside it instead. */
 
 import { createElement, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";

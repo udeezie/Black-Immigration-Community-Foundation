@@ -1,8 +1,8 @@
 /* Home page.
-   
-      Content lives in the arrays at the top of the file (services, testimonials,
-      sponsors...) so copy edits never touch layout. The page body is only
-      composition. */
+
+   Content lives in the arrays at the top of the file (services, testimonials,
+   sponsors...) so copy edits never touch layout. The page body is only
+   composition. */
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -284,7 +284,7 @@ export default function Home({
 
   return (
     <main className="home" id="main">
-      {/* ============================================ HERO */}
+      {/* Hero */}
       <section className="hero surface surface--dark" aria-labelledby="hero-title">
         <div className="hero__bg" aria-hidden="true">
           <img
@@ -338,7 +338,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ STORY + FOUNDATIONS */}
+      {/* Story + foundations */}
       <section
         className="story surface surface--light sheet"
         aria-labelledby="story-title"
@@ -410,7 +410,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ FUNDERS */}
+      {/* Funders */}
       <section
         className="backing surface surface--tint"
         aria-labelledby="backing-title"
@@ -457,7 +457,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ PROGRAMS */}
+      {/* Programs */}
       <section
         className="programs surface surface--dark"
         id="programs"
@@ -534,7 +534,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ FEATURE ROWS */}
+      {/* Feature rows */}
       <section
         className="feature surface surface--light sheet"
         aria-labelledby="feature-title"
@@ -612,7 +612,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ VOICES */}
+      {/* Voices */}
       <section
         className="voices surface surface--tint"
         aria-labelledby="voices-title"
@@ -659,7 +659,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ GET INVOLVED */}
+      {/* Get involved */}
       <section
         className="involve surface surface--dark"
         id="get-involved"
@@ -706,7 +706,7 @@ export default function Home({
         </div>
       </section>
 
-      {/* ============================================ FAQ */}
+      {/* FAQ */}
       <section
         className="faq surface surface--light sheet"
         aria-labelledby="faq-title"

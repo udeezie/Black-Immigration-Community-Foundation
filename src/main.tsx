@@ -1,5 +1,5 @@
 /* Application entry point. Mounts React and wraps the app in the
-      language provider so every component can call `t()` for EN/FR copy. */
+   language provider so every component can call `t()` for EN/FR copy. */
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

@@ -1,7 +1,7 @@
 /* A tiny store holding the app's single Lenis instance.
-   
-      App.tsx creates it; anything that needs to drive smooth scrolling reads it
-      from here rather than creating a second one. */
+
+   App.tsx creates it; anything that needs to drive smooth scrolling reads it
+   from here rather than creating a second one. */
 
 import type Lenis from "lenis";
 

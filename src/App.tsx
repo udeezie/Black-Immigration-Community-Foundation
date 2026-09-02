@@ -1,11 +1,11 @@
 /* Routing and app-wide behaviour.
-   
-      Holds three things worth knowing about:
-      - SmoothScroll owns the single Lenis instance and resets scroll to the top
-        on every route change. Because Lenis intercepts scrolling, pages must NOT
-        call window.scrollTo themselves; it silently does nothing.
-      - SkipLink is the keyboard shortcut past the header to #main.
-      - Pages are lazy loaded, so each route is its own JS chunk. */
+
+   Holds three things worth knowing about:
+   - SmoothScroll owns the single Lenis instance and resets scroll to the top
+   on every route change. Because Lenis intercepts scrolling, pages must NOT
+   call window.scrollTo themselves; it silently does nothing.
+   - SkipLink is the keyboard shortcut past the header to #main.
+   - Pages are lazy loaded, so each route is its own JS chunk. */
 
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";

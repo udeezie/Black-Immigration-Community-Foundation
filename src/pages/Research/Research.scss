@@ -4,8 +4,8 @@
   overflow-x: clip;
 }
 
-/* Why research ============================================================== */
-/* Statement and image, one pulled quote, then the supporting paragraphs
+/* Why research
+   Statement and image, one pulled quote, then the supporting paragraphs
    as three hairline separated columns instead of a run of prose. */
 .why {
   padding-top: calc(var(--section-y) + var(--r-sheet));
@@ -96,7 +96,7 @@
   }
 }
 
-/* Frameworks ================================================================ */
+/* Frameworks */
 .fws {
   padding-block: var(--section-y);
 
@@ -156,6 +156,9 @@
     padding: 10px 16px;
     background: var(--l-bg);
     border-top-right-radius: var(--r-sm);
+    /* Match the media's own corner, otherwise the square corner of this badge
+       leaves a sliver where the parent clips it. */
+    border-bottom-left-radius: var(--r-md);
   }
 
   &__badge-label {
@@ -187,7 +190,7 @@
   }
 }
 
-/* Statement  full bleed photo behind a heavy scrim ========================== */
+/* Statement  full bleed photo behind a heavy scrim */
 .stmt {
   position: relative;
   isolation: isolate;
@@ -242,7 +245,7 @@
   }
 }
 
-/* Goals  a two by two board rather than a numbered list ===================== */
+/* Goals  a two by two board rather than a numbered list */
 .goals {
   padding-top: calc(var(--section-y) + var(--r-sheet));
   padding-bottom: var(--section-y);
@@ -296,7 +299,7 @@
   }
 }
 
-/* Commitment ================================================================ */
+/* Commitment */
 .commitment {
   padding-block: var(--section-y);
 

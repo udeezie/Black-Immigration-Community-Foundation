@@ -1,8 +1,8 @@
 /* Research page.
-   
-      The source material is a long argument, so it is deliberately broken into
-      pieces a reader can enter at any point: a pulled quote, three short notes,
-      two framework panels, a full-bleed statement, then a board of goals. */
+
+   The source material is a long argument, so it is deliberately broken into
+   pieces a reader can enter at any point: a pulled quote, three short notes,
+   two framework panels, a full-bleed statement, then a board of goals. */
 
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -12,7 +12,17 @@ import "./Research.scss";
 
 type Bi = Record<Lang, string>;
 
-const FRAMEWORKS: { n: string; label: Bi; title: Bi; body: Bi; image: string }[] = [
+/* Both photographs are tall portraits dropped into a landscape card, so a
+   centred crop cuts the subject's head. `focus` is the object-position that
+   keeps each face in frame; set it per image if the photography changes. */
+const FRAMEWORKS: {
+  n: string;
+  label: Bi;
+  title: Bi;
+  body: Bi;
+  image: string;
+  focus: string;
+}[] = [
   {
     n: "01",
     label: { en: "Framework", fr: "Cadre" },
@@ -25,6 +35,7 @@ const FRAMEWORKS: { n: string; label: Bi; title: Bi; body: Bi; image: string }[]
       fr: "Nos recherches s'appuient sur un cadre intersectionnel qui reconnaît comment de multiples aspects de l'identité, comme la race, le genre, la classe sociale et le statut d'immigration, se croisent pour façonner les expériences des personnes. Les immigrants noirs font face à des défis uniques et imbriqués qui ne peuvent être examinés sous un seul angle. Par cette approche, la BICF veille à ce que ses constats et ses programmes reflètent véritablement les réalités des personnes les plus touchées par les inégalités systémiques.",
     },
     image: "/r1.webp",
+    focus: "50% 16%",
   },
   {
     n: "02",
@@ -38,6 +49,7 @@ const FRAMEWORKS: { n: string; label: Bi; title: Bi; body: Bi; image: string }[]
       fr: "À la BICF, nous appliquons le Facteur C, une approche qui reconnaît la race comme un facteur constant influençant tous les autres aspects de l'identité. Même lorsque les autres variables demeurent identiques, la race continue d'influer sur l'accès, les possibilités et les résultats. Ce cadre nous aide à mettre au jour comment les préjugés raciaux amplifient les inégalités et façonnent la vie quotidienne des immigrants noirs.",
     },
     image: "/r2.webp",
+    focus: "50% 28%",
   },
 ];
 
@@ -130,7 +142,7 @@ export default function Research() {
 
   return (
     <main className="research" id="main">
-      {/* ============================================ HERO */}
+      {/* Hero */}
       <section className="page-hero surface surface--dark" aria-labelledby="res-title">
         <div className="page-hero__glow" aria-hidden="true" />
         <div className="container page-hero__inner">
@@ -163,7 +175,7 @@ export default function Research() {
         </div>
       </section>
 
-      {/* ============================================ WHY RESEARCH */}
+      {/* Why research */}
       <section className="why surface surface--light sheet" aria-labelledby="why-title">
         <div className="container">
           <div className="why__top">
@@ -214,7 +226,7 @@ export default function Research() {
         </div>
       </section>
 
-      {/* ============================================ FRAMEWORKS */}
+      {/* Frameworks */}
       <section className="fws surface surface--tint" aria-labelledby="fw-title">
         <div className="container">
           <header className="section-head">
@@ -253,6 +265,7 @@ export default function Research() {
                     height={1400}
                     loading="lazy"
                     decoding="async"
+                    style={{ objectPosition: f.focus }}
                   />
                   <figcaption className="fw__badge">
                     <span className="fw__badge-label">{t(f.label)}</span>
@@ -269,7 +282,7 @@ export default function Research() {
         </div>
       </section>
 
-      {/* ============================================ STATEMENT */}
+      {/* Statement */}
       <section className="stmt surface surface--dark" aria-labelledby="stmt-title">
         <div className="stmt__bg" aria-hidden="true">
           <img
@@ -297,7 +310,7 @@ export default function Research() {
         </div>
       </section>
 
-      {/* ============================================ GOALS */}
+      {/* Goals */}
       <section className="goals surface surface--light sheet" aria-labelledby="goals-title">
         <div className="container">
           <header className="section-head">
@@ -333,7 +346,7 @@ export default function Research() {
         </div>
       </section>
 
-      {/* ============================================ COMMITMENT */}
+      {/* Commitment */}
       <section className="commitment surface surface--dark" aria-labelledby="commit-title">
         <div className="container">
           <div className="commitment__grid">

@@ -1,9 +1,9 @@
 /* Contact page.
-   
-      A fully controlled, client-validated form that posts to /api/contact.
-      Fields validate on blur and again on submit; the honeypot field is invisible
-      to people and catches naive bots. On success the form is replaced by a
-      confirmation that takes focus, so screen reader users are told it worked. */
+
+   A fully controlled, client-validated form that posts to /api/contact.
+   Fields validate on blur and again on submit; the honeypot field is invisible
+   to people and catches naive bots. On success the form is replaced by a
+   confirmation that takes focus, so screen reader users are told it worked. */
 
 import {
   useEffect,
@@ -332,7 +332,7 @@ export default function Contact() {
 
   return (
     <main className="contact" id="main">
-      {/* ====================================================== HERO dark */}
+      {/* Hero, dark surface */}
       <section className="page-hero surface surface--dark" aria-labelledby="con-title">
         <div className="page-hero__glow" aria-hidden="true" />
         <div className="container page-hero__inner">
@@ -359,7 +359,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ====================================================== FORM light */}
+      {/* Form, light surface */}
       <section className="cform surface surface--light sheet" aria-labelledby="form-title">
         <div className="container">
           <div className="cform__grid">
@@ -665,7 +665,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* ===================================================== VISIT dark */}
+      {/* Visit, dark surface */}
       <section className="visit surface surface--dark" aria-labelledby="visit-title">
         <div className="container">
           <header className="section-head">
@@ -752,7 +752,7 @@ export default function Contact() {
           </div>
         </div>
       </section>
-      {/* ======================================================= FAQ tint */}
+      {/* FAQ, tint surface */}
       <section className="faq surface surface--tint sheet" aria-labelledby="cfaq-title">
         <div className="container">
           <div className="faq__grid">

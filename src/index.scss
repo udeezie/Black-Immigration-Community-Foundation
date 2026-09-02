@@ -1,12 +1,12 @@
 /* Design system. Everything shared across pages lives here.
-   
-      The core idea is surfaces. A section gets .surface--dark / --light / --tint,
-      and that class re-declares the semantic tokens (--bg, --text, --line,
-      --label...). Components built on those tokens then adapt to whichever
-      section they sit in, which is what makes the dark/light rhythm cheap.
-   
-      Consequence: components should reference --text / --line / --label, never
-      the raw --d-* or --l-* palettes, or they will not adapt. */
+
+   The core idea is surfaces. A section gets .surface--dark / --light / --tint,
+   and that class re-declares the semantic tokens (--bg, --text, --line,
+   --label...). Components built on those tokens then adapt to whichever
+   section they sit in, which is what makes the dark/light rhythm cheap.
+
+   Consequence: components should reference --text / --line / --label, never
+   the raw --d-* or --l-* palettes, or they will not adapt. */
 
 :root {
   --brand: #ff5722;
@@ -92,7 +92,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Reset ===================================================================== */
+/* Reset */
 *,
 *::before,
 *::after {
@@ -148,7 +148,7 @@ textarea {
   background: rgba(120, 118, 112, 0.3);
 }
 
-/* Surfaces  the light / dark rhythm ========================================= */
+/* Surfaces  the light / dark rhythm */
 .surface {
   background: var(--bg);
   color: var(--text);
@@ -220,7 +220,7 @@ textarea {
   z-index: 1;
 }
 
-/* Layout ==================================================================== */
+/* Layout */
 .container {
   width: 100%;
   max-width: var(--container);
@@ -240,7 +240,7 @@ textarea {
   padding-block: var(--section-y-sm);
 }
 
-/* Typography ================================================================ */
+/* Typography */
 .kicker {
   display: inline-block;
   font-family: var(--font-body);
@@ -318,7 +318,7 @@ textarea {
   color: var(--accent);
 }
 
-/* Buttons =================================================================== */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -427,8 +427,8 @@ textarea {
   }
 }
 
-/* Section header ============================================================ */
-/* Kicker, heading, then the supporting line directly beneath it.
+/* Section header
+   Kicker, heading, then the supporting line directly beneath it.
    The max-width sits on the h2 rather than its wrapper because `ch`
    resolves against the element's own font size, and the wrapper is set
    in body text. */
@@ -479,7 +479,7 @@ textarea {
   }
 }
 
-/* Page hero  shared by About / Programs / Research / Contact ================ */
+/* Page hero  shared by About / Programs / Research / Contact */
 .page-hero {
   padding-top: clamp(130px, 17vh, 210px);
   padding-bottom: clamp(70px, 9vw, 120px);
@@ -534,7 +534,7 @@ textarea {
   }
 }
 
-/* FAQ accordion  shared by Home and Contact ================================= */
+/* FAQ accordion  shared by Home and Contact */
 .faq {
   padding-block: var(--section-y);
 
